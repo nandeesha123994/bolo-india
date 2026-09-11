@@ -225,4 +225,45 @@ const addComment = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getAllPosts, deletePost, updatePost, likePost, addComment };
+const getComments = async (req, res) => {
+  try {
+    const postId = Number(req.params.id);
+
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      return res.status(404).json({
+        message: "Post not found",
+      });
+    }
+
+    const comments = await prisma.comment.findMany({
+      where: { postId },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profileImage: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      comments,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+module.exports = { createPost, getAllPosts, deletePost, updatePost, likePost, addComment,getComments };
