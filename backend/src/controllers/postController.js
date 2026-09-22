@@ -1,19 +1,61 @@
 const prisma = require("../config/prisma");
+const fs = require("fs");
+
+const { createNotification } = require("../services/notificationService");
+
+// ==================== CREATE POST ====================
 
 const createPost = async (req, res) => {
-  try {
-    const { content, image } = req.body;
+  const uploadedFiles = Object.values(req.files || {})
+    .flat()
+    .map((file) => file.path);
 
-    if (!content) {
+  try {
+    const {
+      content,
+      category,
+      hashtags,
+      location,
+      visibility,
+      commentsEnabled,
+    } = req.body;
+
+    if (!content || !content.trim()) {
       return res.status(400).json({
         message: "Post content is required",
       });
     }
 
+    const imageFile = req.files?.image?.[0];
+    const videoFile = req.files?.video?.[0];
+
+    const image = imageFile ? `/uploads/${imageFile.filename}` : null;
+    const video = videoFile ? `/uploads/${videoFile.filename}` : null;
+
+    // A post can have either an image or a video, not both
+    if (image && video) {
+      uploadedFiles.forEach((filePath) => {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      });
+
+      return res.status(400).json({
+        message: "A post can contain either an image or a video, not both",
+      });
+    }
+
     const post = await prisma.post.create({
       data: {
-        content,
+        content: content.trim(),
         image,
+        video: video || null,
+        category: category || null,
+        hashtags: hashtags || null,
+        location: location || null,
+        visibility: visibility || "PUBLIC",
+        commentsEnabled:
+          commentsEnabled !== undefined ? Boolean(commentsEnabled) : true,
         authorId: req.user.id,
       },
     });
@@ -24,11 +66,20 @@ const createPost = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
+    uploadedFiles.forEach((filePath) => {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    });
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== GET ALL POSTS ====================
 
 const getAllPosts = async (req, res) => {
   try {
@@ -49,16 +100,29 @@ const getAllPosts = async (req, res) => {
       },
     });
 
+    const postsWithAuthorProfile = posts.map((post) => ({
+      ...post,
+      author: post.author
+        ? {
+            ...post.author,
+            profilePhoto: post.author.profileImage || null,
+          }
+        : null,
+    }));
+
     res.status(200).json({
-      posts,
+      posts: postsWithAuthorProfile,
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== DELETE POST ====================
 
 const deletePost = async (req, res) => {
   try {
@@ -74,7 +138,11 @@ const deletePost = async (req, res) => {
       });
     }
 
-    if (post.authorId !== req.user.id) {
+    if (
+      post.authorId !== req.user.id &&
+      req.user.role !== "ADMIN" &&
+      req.user.role !== "SUPER_ADMIN"
+    ) {
       return res.status(403).json({
         message: "You can only delete your own post",
       });
@@ -89,11 +157,14 @@ const deletePost = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== UPDATE POST ====================
 
 const updatePost = async (req, res) => {
   try {
@@ -130,11 +201,14 @@ const updatePost = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== LIKE POST ====================
 
 const likePost = async (req, res) => {
   try {
@@ -173,23 +247,46 @@ const likePost = async (req, res) => {
       },
     });
 
+    // Don't notify the user if they liked their own post
+    if (post.authorId !== userId) {
+      const liker = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          name: true,
+        },
+      });
+
+      await createNotification({
+        userId: post.authorId,
+        type: "LIKE",
+        message: `${liker?.name || "Someone"} liked your post.`,
+        postId: post.id,
+      });
+    }
+
     res.status(201).json({
       message: "Post liked successfully",
       like,
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== ADD COMMENT ====================
+
 const addComment = async (req, res) => {
   try {
     const postId = Number(req.params.id);
     const { content } = req.body;
 
-    if (!content) {
+    if (!content || !content.trim()) {
       return res.status(400).json({
         message: "Comment content is required",
       });
@@ -205,13 +302,38 @@ const addComment = async (req, res) => {
       });
     }
 
+    if (!post.commentsEnabled) {
+      return res.status(403).json({
+        message: "Comments are disabled for this post",
+      });
+    }
+
     const comment = await prisma.comment.create({
       data: {
-        content,
+        content: content.trim(),
         userId: req.user.id,
         postId,
       },
     });
+
+    // Don't notify the user if they comment on their own post
+    if (post.authorId !== req.user.id) {
+      const commenter = await prisma.user.findUnique({
+        where: {
+          id: req.user.id,
+        },
+        select: {
+          name: true,
+        },
+      });
+
+      await createNotification({
+        userId: post.authorId,
+        type: "COMMENT",
+        message: `${commenter?.name || "Someone"} commented on your post.`,
+        postId: post.id,
+      });
+    }
 
     res.status(201).json({
       message: "Comment added successfully",
@@ -219,11 +341,14 @@ const addComment = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== GET COMMENTS ====================
 
 const getComments = async (req, res) => {
   try {
@@ -260,10 +385,67 @@ const getComments = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
 
-module.exports = { createPost, getAllPosts, deletePost, updatePost, likePost, addComment,getComments };
+// ==================== DELETE COMMENT ====================
+
+const deleteComment = async (req, res) => {
+  try {
+    const commentId = Number(req.params.id);
+
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+    });
+
+    if (!comment) {
+      return res.status(404).json({
+        message: "Comment not found",
+      });
+    }
+
+    // User can delete only their own comment.
+    // Moderator, Admin and Super Admin can delete any comment.
+    if (
+      comment.userId !== req.user.id &&
+      req.user.role !== "MODERATOR" &&
+      req.user.role !== "ADMIN" &&
+      req.user.role !== "SUPER_ADMIN"
+    ) {
+      return res.status(403).json({
+        message: "You can only delete your own comment",
+      });
+    }
+
+    await prisma.comment.delete({
+      where: { id: commentId },
+    });
+
+    res.status(200).json({
+      message: "Comment deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+// ==================== EXPORT ====================
+
+module.exports = {
+  createPost,
+  getAllPosts,
+  deletePost,
+  updatePost,
+  likePost,
+  addComment,
+  getComments,
+  deleteComment,
+};

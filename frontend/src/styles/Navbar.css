@@ -1,29 +1,509 @@
+/* ==================== NAVBAR ==================== */
+
 .navbar {
+  width: 100%;
+  height: 72px;
+  padding: 0 40px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8ecf2;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 40px;
-  background: #2563eb;
-  color: white;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
+/* ==================== LOGO ==================== */
+
 .navbar-logo {
-  font-size: 24px;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 22px;
+  font-weight: 800;
+
+  color: #1f2937;
+
+  white-space: nowrap;
+  cursor: pointer;
 }
+
+.navbar-logo::first-letter {
+  font-size: 24px;
+}
+
+/* ==================== NAVBAR LINKS ==================== */
 
 .navbar-links {
   display: flex;
-  gap: 25px;
+  align-items: center;
+  gap: 8px;
 }
 
+/* ==================== NORMAL LINKS ==================== */
+
 .navbar-links a {
-  color: white;
+  position: relative;
+
   text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
+
+  color: #4b5563;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  padding: 10px 14px;
+
+  border-radius: 10px;
+
+  transition: all 0.2s ease;
 }
 
 .navbar-links a:hover {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+/* ==================== LINK UNDERLINE ==================== */
+
+.navbar-links a::after {
+  content: "";
+
+  position: absolute;
+
+  left: 14px;
+  right: 14px;
+  bottom: 5px;
+
+  height: 2px;
+
+  background: #2563eb;
+
+  transform: scaleX(0);
+
+  transition: transform 0.2s ease;
+
+  border-radius: 10px;
+}
+
+.navbar-links a:hover::after {
+  transform: scaleX(1);
+}
+
+/* ==================== LOGOUT ==================== */
+
+.navbar-links > button:not(.notification-button) {
+  border: none;
+
+  background: #fff1f2 !important;
+
+  color: #dc2626 !important;
+
+  font-size: 14px !important;
+  font-weight: 600;
+
+  padding: 10px 16px !important;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.navbar-links > button:not(.notification-button):hover {
+  background: #fee2e2 !important;
+
+  color: #b91c1c !important;
+
+  transform: translateY(-1px);
+}
+
+/* ==================== NOTIFICATION CONTAINER ==================== */
+
+.notification-container {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  margin-left: 4px;
+}
+
+/* ==================== NOTIFICATION BUTTON ==================== */
+
+.notification-button {
+  position: relative;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid #e5e7eb !important;
+
+  border-radius: 50%;
+
+  background: #f8fafc !important;
+
+  color: #374151 !important;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px !important;
+
+  cursor: pointer;
+
+  padding: 0 !important;
+
+  transition: all 0.2s ease;
+}
+
+.notification-button:hover {
+  background: #eff6ff !important;
+
+  border-color: #bfdbfe !important;
+
+  transform: translateY(-1px);
+}
+
+/* ==================== NOTIFICATION COUNT ==================== */
+
+.notification-count {
+  position: absolute;
+
+  top: -4px;
+  right: -4px;
+
+  min-width: 19px;
+  height: 19px;
+
+  padding: 0 5px;
+
+  border-radius: 20px;
+
+  background: #ef4444;
+
+  color: white;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid white;
+
+  box-sizing: border-box;
+}
+
+/* ==================== NOTIFICATION DROPDOWN ==================== */
+
+.notification-dropdown {
+  position: absolute;
+
+  top: 52px;
+  right: 0;
+
+  width: 380px;
+  max-height: 520px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.12),
+    0 5px 15px rgba(0, 0, 0, 0.05);
+
+  overflow: hidden;
+
+  z-index: 2000;
+
+  animation: notificationDropdown 0.18s ease-out;
+}
+
+/* ==================== DROPDOWN ANIMATION ==================== */
+
+@keyframes notificationDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== NOTIFICATION HEADER ==================== */
+
+.notification-header {
+  padding: 17px 18px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #eef0f4;
+}
+
+.notification-header h3 {
+  margin: 0;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.notification-header button {
+  border: none !important;
+
+  background: transparent !important;
+
+  color: #2563eb !important;
+
+  font-size: 12px !important;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  padding: 5px !important;
+}
+
+.notification-header button:hover {
   text-decoration: underline;
+}
+
+/* ==================== NOTIFICATION LIST ==================== */
+
+.notification-list {
+  max-height: 440px;
+
+  overflow-y: auto;
+}
+
+/* ==================== NOTIFICATION ITEM ==================== */
+
+.notification-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 13px;
+
+  padding: 15px 18px;
+
+  border-bottom: 1px solid #f1f3f6;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.notification-item:hover {
+  background: #f8fafc;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+/* ==================== UNREAD ==================== */
+
+.notification-item.unread {
+  background: #eff6ff;
+
+  border-left: 3px solid #2563eb;
+}
+
+.notification-item.unread:hover {
+  background: #e0efff;
+}
+
+/* ==================== NOTIFICATION ICON ==================== */
+
+.notification-icon {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #f3f4f6;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 17px;
+}
+
+/* ==================== NOTIFICATION CONTENT ==================== */
+
+.notification-content {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.notification-content p {
+  margin: 0 0 5px;
+
+  color: #1f2937;
+
+  font-size: 14px;
+
+  line-height: 1.45;
+}
+
+.notification-content small {
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+/* ==================== EMPTY NOTIFICATIONS ==================== */
+
+.no-notifications {
+  margin: 0;
+
+  padding: 55px 20px;
+
+  text-align: center;
+
+  color: #9ca3af;
+
+  font-size: 14px;
+}
+
+/* ==================== SCROLLBAR ==================== */
+
+.notification-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+
+  border-radius: 10px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* ==================== TABLET ==================== */
+
+@media (max-width: 900px) {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .navbar-links {
+    gap: 4px;
+  }
+
+  .navbar-links a {
+    padding: 9px 10px;
+
+    font-size: 14px;
+  }
+}
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 650px) {
+  .navbar {
+    height: 64px;
+
+    padding: 0 14px;
+  }
+
+  .navbar-logo {
+    font-size: 18px;
+  }
+
+  .navbar-links {
+    gap: 5px;
+  }
+
+  .navbar-links a {
+    display: none;
+  }
+
+  .notification-button {
+    width: 39px;
+    height: 39px;
+
+    font-size: 18px !important;
+  }
+
+  .navbar-links > button:not(.notification-button) {
+    padding: 8px 12px !important;
+
+    font-size: 12px !important;
+  }
+
+  .notification-dropdown {
+    position: fixed;
+
+    top: 70px;
+
+    left: 10px;
+    right: 10px;
+
+    width: auto;
+
+    max-height: calc(100vh - 85px);
+
+    border-radius: 14px;
+  }
+
+  .notification-list {
+    max-height: calc(100vh - 160px);
+  }
+}
+
+/* ==================== SMALL MOBILE ==================== */
+
+@media (max-width: 400px) {
+  .navbar-logo {
+    font-size: 16px;
+  }
+
+  .notification-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .navbar-links > button:not(.notification-button) {
+    padding: 7px 10px !important;
+  }
 }

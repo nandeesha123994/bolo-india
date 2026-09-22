@@ -1,0 +1,394 @@
+/* ==================== MAIN CONTAINER ==================== */
+
+.super-admin-container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f5f7fb;
+}
+
+.super-admin-card {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.super-admin-card h1 {
+  margin-bottom: 8px;
+  color: #2563eb;
+}
+
+.super-admin-description {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* ==================== TABS ==================== */
+
+.super-admin-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 6px;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.super-admin-tabs button {
+  flex: 1;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.super-admin-tabs button:hover {
+  background: #e2e8f0;
+  color: #2563eb;
+}
+
+.super-admin-tabs button.active-tab {
+  background: #2563eb;
+  color: white;
+}
+
+/* ==================== CONTENT ==================== */
+
+.management-content {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== SECTION ==================== */
+
+.section-title {
+  margin-top: 30px;
+  margin-bottom: 18px;
+  color: #333;
+}
+
+/* ==================== STATISTICS ==================== */
+
+.super-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.super-stat-card {
+  padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  transition: box-shadow 0.2s ease;
+}
+
+.super-stat-card:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+}
+
+.super-stat-card h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: #2563eb;
+}
+
+.super-stat-card p {
+  margin: 0;
+  color: #666;
+  font-weight: 600;
+}
+
+/* ==================== USER TABLE ==================== */
+
+.super-user-table-wrapper {
+  width: 100%;
+  margin-bottom: 30px;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+}
+
+.super-user-table {
+  width: 100%;
+  min-width: 950px;
+  border-collapse: collapse;
+  background: white;
+}
+
+/* ==================== TABLE HEADER ==================== */
+
+.super-user-table thead {
+  background: #f1f5f9;
+}
+
+.super-user-table th {
+  padding: 15px 16px;
+  text-align: left;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+/* ==================== TABLE BODY ==================== */
+
+.super-user-table td {
+  padding: 16px;
+  color: #444;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+
+.super-user-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.super-user-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.super-user-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==================== USER ID ==================== */
+
+.super-user-id {
+  color: #777 !important;
+  font-weight: 600;
+}
+
+/* ==================== USER ==================== */
+
+.super-table-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.super-table-user strong {
+  color: #333;
+  white-space: nowrap;
+}
+
+/* ==================== USER AVATAR ==================== */
+
+.super-user-avatar {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ==================== EMAIL ==================== */
+
+.super-user-email {
+  color: #666 !important;
+}
+
+/* ==================== ROLE BADGES ==================== */
+
+.super-role-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.role-user {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.role-admin {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.role-content_manager {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.role-moderator {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.role-super_admin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ==================== ROLE SELECT ==================== */
+
+.super-role-select {
+  min-width: 165px;
+  padding: 9px 12px;
+
+  border: 1px solid #ccc;
+  border-radius: 7px;
+
+  background: white;
+  color: #475569;
+
+  font-size: 13px;
+
+  outline: none;
+  cursor: pointer;
+}
+
+.super-role-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* ==================== UPDATE BUTTON ==================== */
+
+.super-update-button {
+  padding: 10px 15px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+
+  font-weight: 600;
+  white-space: nowrap;
+
+  transition: background 0.2s ease;
+}
+
+.super-update-button:hover {
+  background: #1d4ed8;
+}
+
+/* ==================== PROTECTED USER ==================== */
+
+.super-protected-role {
+  display: inline-block;
+
+  padding: 8px 12px;
+
+  background: #fef3c7;
+  color: #92400e;
+
+  border-radius: 7px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.super-protected-text {
+  color: #92400e;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ==================== NO USERS ==================== */
+
+.super-no-users {
+  padding: 30px !important;
+  text-align: center !important;
+  color: #777 !important;
+}
+
+/* ==================== CONTACT MESSAGES ==================== */
+
+.contact-messages-section {
+  margin-top: 30px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 900px) {
+  .super-admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .super-user-table-wrapper {
+    overflow-x: auto;
+  }
+}
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 700px) {
+  .super-admin-container {
+    padding: 20px 10px;
+  }
+
+  .super-admin-card {
+    padding: 20px;
+  }
+
+  .super-admin-tabs {
+    flex-direction: column;
+  }
+
+  .super-admin-tabs button {
+    width: 100%;
+  }
+
+  .super-admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .super-user-table {
+    min-width: 950px;
+  }
+}
+
+/* ==================== SMALL MOBILE ==================== */
+
+@media (max-width: 400px) {
+  .super-admin-card h1 {
+    font-size: 24px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+}

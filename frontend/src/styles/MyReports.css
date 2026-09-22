@@ -1,0 +1,91 @@
+.my-reports-container {
+  min-height: calc(100vh - 70px);
+  padding: 30px;
+  background: #f5f7fb;
+}
+
+.my-reports-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.my-reports-card h1 {
+  margin-bottom: 8px;
+}
+
+.my-reports-description {
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.my-report-card {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.my-report-card h3 {
+  margin-bottom: 15px;
+}
+
+.my-report-card p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.report-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.report-status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.report-status.resolved {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.report-status.rejected {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.manager-response {
+  margin-top: 15px;
+  padding: 14px;
+  background: #eef4ff;
+  border-left: 4px solid #2563eb;
+  border-radius: 6px;
+}
+
+.manager-response p {
+  margin-top: 8px;
+}
+
+.waiting-message {
+  color: #856404;
+  font-style: italic;
+}
+
+.no-reports {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}

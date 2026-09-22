@@ -1,0 +1,1058 @@
+/* ==================== GLOBAL ==================== */
+
+.landing-page {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #1f2937;
+  font-family: Arial, sans-serif;
+}
+
+/* ==================== HEADER ==================== */
+
+.landing-header {
+  width: 100%;
+  height: 72px;
+
+  padding: 0 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  box-sizing: border-box;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ==================== LOGO ==================== */
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  font-size: 23px;
+  font-weight: 800;
+
+  color: #1f2937;
+
+  white-space: nowrap;
+}
+
+.landing-logo-image {
+  width: 102px;
+  height: 62px;
+
+  object-fit: contain;
+
+  display: block;
+}
+
+/* ==================== HEADER BUTTONS ==================== */
+
+.landing-header-buttons {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.landing-header-buttons button {
+  min-width: 95px;
+
+  border: 1px solid #2563eb;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  padding: 10px 18px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.landing-header-buttons button:hover {
+  background: #544ca6;
+  border-color: #3c5bae;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+/* ==================== HERO ==================== */
+
+.landing-hero {
+  min-height: 620px;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1px 1px;
+
+  box-sizing: border-box;
+
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 50%, #f4f8ff 100%);
+}
+
+/* ==================== HERO CONTENT ==================== */
+
+.landing-hero-content {
+  width: 100%;
+  max-width: 1500px;
+
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==================== COMPANY IMAGE ==================== */
+
+.landing-image {
+  width: 100%;
+
+  margin-bottom: 30px;
+}
+
+.company-image {
+  width: 100%;
+  max-width: 1500px;
+
+  height: 600px;
+
+  object-fit: cover;
+
+  display: block;
+
+  margin: 0 auto 30px;
+
+  border-radius: 16px;
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== HERO TITLE ==================== */
+
+.landing-hero h1 {
+  margin: 0;
+
+  font-size: 52px;
+  font-weight: 800;
+
+  color: #111827;
+
+  letter-spacing: -1px;
+}
+
+.landing-hero h2 {
+  margin: 15px 0 0;
+
+  font-size: 27px;
+  font-weight: 600;
+
+  color: #2563eb;
+}
+
+.landing-hero p {
+  margin: 18px 0 0;
+
+  max-width: 600px;
+
+  font-size: 18px;
+
+  line-height: 1.6;
+
+  color: #6b7280;
+}
+
+/* ==================== HERO BUTTONS ==================== */
+
+.landing-hero-buttons {
+  display: flex;
+
+  gap: 14px;
+
+  margin-top: 30px;
+}
+
+.landing-hero-buttons button {
+  min-width: 130px;
+
+  padding: 13px 24px;
+
+  border-radius: 9px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+/* ==================== REGISTER BUTTON ==================== */
+
+.register-button {
+  border: none;
+
+  background: #2563eb;
+
+  color: #ffffff;
+}
+
+.register-button:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+/* ==================== LOGIN BUTTON ==================== */
+
+.login-button {
+  border: 1px solid #2563eb;
+
+  background: #ffffff;
+
+  color: #2563eb;
+}
+
+.login-button:hover {
+  background: #eff6ff;
+
+  transform: translateY(-2px);
+}
+
+/* ==================== ABOUT ==================== */
+
+.landing-about {
+  padding: 80px 20px;
+
+  background: #ffffff;
+
+  text-align: center;
+}
+
+.landing-section-content {
+  max-width: 750px;
+
+  margin: 0 auto;
+}
+
+.landing-about h2,
+.landing-features h2,
+.landing-contact h2 {
+  margin: 0 0 18px;
+
+  font-size: 30px;
+
+  color: #111827;
+}
+
+.landing-about p {
+  margin: 0;
+
+  font-size: 16px;
+
+  line-height: 1.8;
+
+  color: #6b7280;
+}
+
+/* ==================== ABOUT CONTENT ==================== */
+
+.about-greeting {
+  margin-bottom: 10px !important;
+
+  font-size: 20px !important;
+
+  font-weight: 700;
+
+  color: #2563eb !important;
+}
+
+.landing-about h2 {
+  margin-bottom: 25px;
+}
+
+.about-description {
+  max-width: 800px;
+
+  margin: 0 auto 18px !important;
+
+  font-size: 16px;
+
+  line-height: 1.8;
+
+  color: #6b7280;
+}
+
+/* ==================== FEATURES ==================== */
+
+.landing-features {
+  padding: 80px 30px;
+
+  background: #f8fafc;
+
+  text-align: center;
+}
+
+.feature-grid {
+  max-width: 1000px;
+
+  margin: 40px auto 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 20px;
+}
+
+.feature-card {
+  padding: 30px 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  transition: all 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.07);
+}
+
+.feature-card span {
+  display: block;
+
+  font-size: 35px;
+
+  margin-bottom: 15px;
+}
+
+.feature-card h3 {
+  margin: 0 0 10px;
+
+  font-size: 18px;
+
+  color: #111827;
+}
+
+.feature-card p {
+  margin: 0;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  color: #6b7280;
+}
+
+/* ==================== CTA ==================== */
+
+.landing-cta {
+  padding: 80px 20px;
+
+  text-align: center;
+
+  background: #eff6ff;
+}
+
+.landing-cta h2 {
+  margin: 0;
+
+  font-size: 32px;
+
+  color: #111827;
+}
+
+.landing-cta p {
+  margin: 15px 0 25px;
+
+  color: #6b7280;
+
+  font-size: 16px;
+}
+
+.landing-cta button {
+  border: none;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  padding: 13px 25px;
+
+  border-radius: 9px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.landing-cta button:hover {
+  background: #4762ae;
+
+  transform: translateY(-2px);
+}
+
+/* ==================== CONTACT ==================== */
+
+.landing-contact {
+  padding: 90px 20px;
+
+  background: #f8fafc;
+}
+
+.contact-container {
+  max-width: 1050px;
+
+  margin: 0 auto;
+}
+
+.contact-heading {
+  text-align: center;
+
+  max-width: 650px;
+
+  margin: 0 auto 50px;
+}
+
+.contact-label {
+  margin: 0 0 10px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  color: #2563eb;
+}
+
+.contact-heading h2 {
+  margin: 0 0 15px;
+
+  font-size: 34px;
+
+  color: #111827;
+}
+
+.contact-heading > p:last-child {
+  margin: 0;
+
+  font-size: 16px;
+
+  line-height: 1.7;
+
+  color: #6b7280;
+}
+
+/* ==================== CONTACT CONTENT ==================== */
+
+.contact-content {
+  display: grid;
+
+  grid-template-columns: 0.9fr 1.1fr;
+
+  gap: 50px;
+
+  align-items: start;
+}
+
+/* ==================== CONTACT INFO ==================== */
+
+.contact-info-box {
+  padding: 35px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 16px;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+.contact-info-box h3 {
+  margin: 0 0 30px;
+
+  font-size: 22px;
+
+  color: #111827;
+}
+
+.contact-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-bottom: 25px;
+}
+
+.contact-item:last-child {
+  margin-bottom: 0;
+}
+
+.contact-item > span {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #eff6ff;
+
+  border-radius: 10px;
+
+  font-size: 20px;
+}
+
+.contact-item h4 {
+  margin: 0 0 5px;
+
+  font-size: 15px;
+
+  color: #111827;
+}
+
+.contact-item p {
+  margin: 0;
+
+  font-size: 14px;
+
+  color: #6b7280;
+}
+
+/* ==================== CONTACT FORM ==================== */
+
+.contact-form {
+  padding: 35px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 16px;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 13px 15px;
+
+  margin-bottom: 15px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 14px;
+
+  color: #1f2937;
+
+  transition: border-color 0.2s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #2563eb;
+}
+
+.contact-form textarea {
+  resize: vertical;
+}
+
+.contact-form button {
+  width: 100%;
+
+  padding: 13px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.contact-form button:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
+}
+
+/* ==================== FOOTER ==================== */
+
+.landing-footer {
+  background: #0f172adf;
+  color: #ffffff;
+
+  padding: 55px 30px 20px;
+}
+
+.footer-content {
+  max-width: 1100px;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns: 1.5fr 1fr 1.2fr 1fr;
+
+  gap: 50px;
+}
+
+/* ==================== FOOTER BRAND ==================== */
+
+.footer-brand {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+}
+
+.footer-logo {
+  width: 110px;
+  height: 60px;
+
+  object-fit: contain;
+
+  margin-bottom: 12px;
+}
+
+.footer-brand p {
+  max-width: 300px;
+
+  margin: 0;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  color: #9ca3af;
+}
+
+/* ==================== FOOTER HEADINGS ==================== */
+
+.footer-links h3,
+.footer-contact h3,
+.footer-social h3 {
+  margin: 0 0 18px;
+
+  font-size: 16px;
+
+  color: #ffffff;
+}
+
+/* ==================== FOOTER LINKS ==================== */
+
+.footer-links {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+}
+
+.footer-links button {
+  padding: 0;
+
+  margin-bottom: 10px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #9ca3af;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.footer-links button:hover {
+  color: #ffffff;
+}
+
+/* ==================== FOOTER CONTACT ==================== */
+
+.footer-contact p {
+  margin: 0 0 12px;
+
+  font-size: 14px;
+
+  color: #9ca3af;
+}
+
+/* ==================== SOCIAL MEDIA ==================== */
+
+.social-links {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.social-links a {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #1f2937;
+
+  color: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 17px;
+
+  transition: all 0.2s ease;
+}
+
+.social-links a:hover {
+  background: #2563eb;
+
+  color: #ffffff;
+
+  transform: translateY(-3px);
+
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25);
+}
+
+/* ==================== FOOTER BOTTOM ==================== */
+
+.footer-bottom {
+  max-width: 1100px;
+
+  margin: 40px auto 0;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #374151;
+
+  text-align: center;
+}
+
+.footer-bottom p {
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #6b7280;
+}
+
+/* ==================== TABLET ==================== */
+
+@media (max-width: 1100px) {
+  .landing-header {
+    padding: 0 30px;
+  }
+
+  .landing-hero-content {
+    max-width: 95%;
+  }
+
+  .company-image {
+    height: 500px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1.5fr 1fr 1fr;
+
+    gap: 35px;
+  }
+}
+
+/* ==================== TABLET ==================== */
+
+@media (max-width: 900px) {
+  .landing-header {
+    padding: 0 25px;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .company-image {
+    height: 420px;
+  }
+
+  .contact-content {
+    grid-template-columns: 1fr;
+
+    gap: 25px;
+  }
+
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 35px;
+  }
+}
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 600px) {
+  /* ==================== HEADER ==================== */
+
+  .landing-header {
+    height: 64px;
+
+    padding: 0 15px;
+  }
+
+  .landing-logo {
+    font-size: 18px;
+  }
+
+  .landing-logo-image {
+    width: 70px;
+    height: 45px;
+  }
+
+  .landing-header-buttons {
+    gap: 7px;
+  }
+
+  .landing-header-buttons button {
+    min-width: auto;
+
+    padding: 8px 12px;
+
+    font-size: 12px;
+  }
+
+  /* ==================== HERO ==================== */
+
+  .landing-hero {
+    min-height: auto;
+
+    padding: 50px 15px 65px;
+  }
+
+  .landing-hero-content {
+    max-width: 100%;
+  }
+
+  .landing-image {
+    margin-bottom: 20px;
+  }
+
+  .company-image {
+    width: 100%;
+
+    height: 220px;
+
+    border-radius: 12px;
+
+    margin-bottom: 25px;
+  }
+
+  .landing-hero h1 {
+    font-size: 38px;
+  }
+
+  .landing-hero h2 {
+    font-size: 21px;
+  }
+
+  .landing-hero p {
+    font-size: 15px;
+  }
+
+  /* ==================== HERO BUTTONS ==================== */
+
+  .landing-hero-buttons {
+    width: 100%;
+
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+  .landing-hero-buttons button {
+    width: 100%;
+  }
+
+  /* ==================== SECTIONS ==================== */
+
+  .landing-about,
+  .landing-features,
+  .landing-contact,
+  .landing-cta {
+    padding: 60px 20px;
+  }
+
+  .landing-about h2,
+  .landing-features h2,
+  .landing-contact h2 {
+    font-size: 26px;
+  }
+
+  /* ==================== FEATURES ==================== */
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+
+    gap: 15px;
+  }
+
+  /* ==================== CONTACT ==================== */
+
+  .contact-heading {
+    margin-bottom: 35px;
+  }
+
+  .contact-heading h2 {
+    font-size: 28px;
+  }
+
+  .contact-info-box,
+  .contact-form {
+    padding: 25px;
+  }
+
+  /* ==================== FOOTER ==================== */
+
+  .landing-footer {
+    padding: 45px 20px 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+
+    gap: 30px;
+
+    text-align: center;
+  }
+
+  .footer-brand,
+  .footer-links {
+    align-items: center;
+  }
+
+  .footer-brand p {
+    max-width: 350px;
+  }
+
+  .footer-social {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+  }
+
+  .footer-bottom {
+    margin-top: 30px;
+  }
+}
+
+/* ==================== SMALL MOBILE ==================== */
+
+@media (max-width: 400px) {
+  .landing-logo {
+    font-size: 16px;
+  }
+
+  .landing-logo-image {
+    width: 60px;
+    height: 40px;
+  }
+
+  .landing-header-buttons button {
+    padding: 7px 10px;
+
+    font-size: 11px;
+  }
+
+  .landing-hero h1 {
+    font-size: 32px;
+  }
+
+  .landing-hero h2 {
+    font-size: 19px;
+  }
+
+  .company-image {
+    height: 190px;
+  }
+
+  .social-links {
+    gap: 8px;
+  }
+
+  .social-links a {
+    width: 35px;
+    height: 35px;
+
+    font-size: 15px;
+  }
+}

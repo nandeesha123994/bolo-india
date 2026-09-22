@@ -48,8 +48,7 @@ function Register() {
       newErrors.password =
         "Password must contain at least one lowercase letter";
     } else if (!/[0-9]/.test(password)) {
-      newErrors.password =
-        "Password must contain at least one number";
+      newErrors.password = "Password must contain at least one number";
     }
 
     // Confirm password validation
@@ -89,27 +88,29 @@ function Register() {
       }, 1500);
     } catch (error) {
       setErrors({
-        server:
-          error.response?.data?.message || "Registration failed",
+        server: error.response?.data?.message || "Registration failed",
       });
     }
   };
 
   return (
     <div className="register-container">
+      <button
+        type="button"
+        className="back-landing-button"
+        onClick={() => navigate("/")}
+      >
+        ← Back to Home Page
+      </button>
       <div className="register-card">
         <h1>Bolo India 🇮🇳</h1>
 
         <h2>Create Account</h2>
         <p>Join the Bolo India community</p>
 
-        {errors.server && (
-          <p className="register-error">{errors.server}</p>
-        )}
+        {errors.server && <p className="register-error">{errors.server}</p>}
 
-        {success && (
-          <p className="register-success">{success}</p>
-        )}
+        {success && <p className="register-success">{success}</p>}
 
         <form onSubmit={handleRegister}>
           {/* Name */}
@@ -120,9 +121,7 @@ function Register() {
             onChange={(e) => setName(e.target.value)}
           />
 
-          {errors.name && (
-            <p className="field-error">{errors.name}</p>
-          )}
+          {errors.name && <p className="field-error">{errors.name}</p>}
 
           {/* Email */}
           <input
@@ -132,9 +131,7 @@ function Register() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          {errors.email && (
-            <p className="field-error">{errors.email}</p>
-          )}
+          {errors.email && <p className="field-error">{errors.email}</p>}
 
           {/* Password */}
           <div className="password-input">
@@ -147,55 +144,40 @@ function Register() {
 
             <button
               type="button"
-              onClick={() =>
-                setShowPassword(!showPassword)
-              }
+              onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? "🙈" : "👁️"}
             </button>
           </div>
 
-          {errors.password && (
-            <p className="field-error">{errors.password}</p>
-          )}
+          {errors.password && <p className="field-error">{errors.password}</p>}
 
           {/* Confirm Password */}
           <div className="password-input">
             <input
-              type={
-                showConfirmPassword ? "text" : "password"
-              }
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm your password"
               value={confirmPassword}
-              onChange={(e) =>
-                setConfirmPassword(e.target.value)
-              }
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
 
             <button
               type="button"
-              onClick={() =>
-                setShowConfirmPassword(
-                  !showConfirmPassword
-                )
-              }
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               {showConfirmPassword ? "🙈" : "👁️"}
             </button>
           </div>
 
           {errors.confirmPassword && (
-            <p className="field-error">
-              {errors.confirmPassword}
-            </p>
+            <p className="field-error">{errors.confirmPassword}</p>
           )}
 
           <button type="submit">Register</button>
         </form>
 
         <div className="register-login">
-          Already have an account?{" "}
-          <Link to="/login">Login</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </div>
       </div>
     </div>

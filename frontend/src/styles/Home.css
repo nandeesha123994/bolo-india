@@ -33,8 +33,545 @@
   color: white;
   font-size: 16px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .home-card button:hover {
   background: #1d4ed8;
+}
+
+/* =========================
+   Create Post Form
+========================= */
+
+.post-form {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  text-align: left;
+}
+
+.post-form textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+}
+
+.post-form textarea:focus {
+  border-color: #2563eb;
+}
+
+.post-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.post-field label {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.post-field input[type="file"] {
+  width: 100%;
+  padding: 9px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.selected-file {
+  margin: 0 !important;
+  color: #475569 !important;
+  font-size: 13px !important;
+}
+
+.post-form button {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.post-form button:hover {
+  background: #1d4ed8;
+}
+
+/* =========================
+   Recent Posts
+========================= */
+
+.posts-container {
+  margin-top: 40px;
+  text-align: left;
+}
+
+.posts-container h2 {
+  text-align: center;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+
+/* =========================
+   Post Card
+========================= */
+
+.post-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.post-author-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.post-avatar,
+.post-avatar-placeholder {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #dbeafe;
+  background: #dbeafe;
+}
+
+.post-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1d4ed8;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.post-author-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.post-author-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.post-card p {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.post-content {
+  margin-top: 10px !important;
+  color: #1f2937;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* =========================
+   Post Information
+========================= */
+
+.post-category,
+.post-hashtags,
+.post-location,
+.post-visibility {
+  margin: 5px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.post-category {
+  font-weight: 600;
+  color: #222;
+}
+
+.post-hashtags {
+  color: #2563eb;
+}
+
+.post-location {
+  color: #555;
+}
+
+.post-visibility {
+  color: #666;
+  font-size: 13px;
+}
+
+/* =========================
+   Post Image
+========================= */
+
+.post-image {
+  display: block;
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  background: #f1f5f9;
+  border-radius: 10px;
+  margin: 16px 0;
+}
+
+/* =========================
+   Post Video
+========================= */
+
+.post-video {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #000;
+  border-radius: 10px;
+  margin: 16px 0;
+}
+
+@media (max-width: 600px) {
+  .home-card {
+    padding: 24px 16px;
+  }
+
+  .post-video {
+    max-height: 320px;
+  }
+}
+
+/* =========================
+   Post Action Buttons
+========================= */
+
+.post-card > button {
+  margin-top: 4px;
+  margin-right: 8px;
+  padding: 9px 18px;
+  border-radius: 7px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Like Button */
+
+.post-card > button:first-of-type {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+
+.post-card > button:first-of-type:hover {
+  background: #1d4ed8;
+}
+
+/* Report Button */
+
+.post-card > button:nth-of-type(2) {
+  background: #e1878f;
+  color: white;
+  border: 1px solid #f1aeb5;
+  margin-left: 0;
+}
+
+.post-card > button:nth-of-type(2):hover {
+  background: #d40a1f;
+}
+
+/* =========================
+   Comments Section
+========================= */
+
+.comments-section {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.comments-section h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.comment {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+/* =========================
+   Comment Form
+========================= */
+
+.comment-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.comment-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.comment-form input:focus {
+  border-color: #2563eb;
+}
+
+.comment-form button {
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.comment-form button:hover {
+  background: #1d4ed8;
+}
+
+/* =========================
+   Report Section
+========================= */
+
+.report-form {
+  margin-top: 12px;
+  padding: 14px;
+  background: #fff7f7;
+  border: 1px solid #f1caca;
+  border-radius: 10px;
+}
+
+.report-form textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.report-form textarea:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.08);
+}
+
+.report-form button {
+  margin-top: 10px;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 7px;
+  background: #dc3545;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.report-form button:hover {
+  background: #b02a37;
+}
+
+/* =========================
+   Create Post Fields
+========================= */
+
+.post-field {
+  margin-top: 12px;
+  text-align: left;
+}
+
+.post-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.post-field input,
+.post-field select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.post-field input:focus,
+.post-field select:focus {
+  border-color: #2563eb;
+}
+
+/* =========================
+   Comments Setting
+========================= */
+
+.comments-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.comments-setting label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+}
+
+.comments-setting input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* =========================
+   Comments Disabled
+========================= */
+
+.comments-disabled {
+  margin-top: 12px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* =========================
+   Responsive Design
+========================= */
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 20px 12px;
+  }
+
+  .home-card {
+    padding: 25px 15px;
+  }
+
+  .post-form textarea {
+    width: 100%;
+  }
+
+  .post-image,
+  .post-video {
+    height: 300px;
+  }
+
+  .comment-form {
+    flex-direction: column;
+  }
+
+  .comment-form button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-card {
+    padding: 20px 12px;
+  }
+
+  .post-card {
+    padding: 15px;
+  }
+
+  .post-image,
+  .post-video {
+    height: 250px;
+  }
+
+  .post-card > button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Delete Post Button */
+.delete-post-button {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 8px;
+  transition: background 0.2s ease;
+}
+
+.delete-post-button:hover {
+  background: green;
 }

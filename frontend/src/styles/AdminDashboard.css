@@ -1,0 +1,360 @@
+.admin-container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f4f7fb;
+}
+
+.admin-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.admin-card h1 {
+  text-align: center;
+  color: #2563eb;
+  margin-bottom: 10px;
+}
+
+.admin-description {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* ==================== STATISTICS ==================== */
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  padding: 20px;
+  text-align: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.stat-card h2 {
+  margin: 0 0 5px;
+  color: #2563eb;
+  font-size: 28px;
+}
+
+.stat-card p {
+  margin: 0;
+  color: #666;
+  font-weight: bold;
+}
+
+/* ==================== ADMIN TABS ==================== */
+
+.admin-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 6px;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.admin-tabs button {
+  flex: 1;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-tabs button:hover {
+  background: #e2e8f0;
+  color: #2563eb;
+}
+
+.admin-tabs button.active-tab {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+}
+
+/* ==================== MANAGEMENT CONTENT ==================== */
+
+.management-content {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== SECTION ==================== */
+
+.section-title {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 22px;
+}
+
+/* ==================== USERS ==================== */
+
+.admin-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  margin-bottom: 15px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  transition: box-shadow 0.2s ease;
+}
+
+.admin-user:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.admin-user h3 {
+  margin: 0 0 5px;
+  color: #333;
+}
+
+.admin-user p {
+  margin: 0 0 6px;
+  color: #666;
+}
+
+.admin-user span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+/* ==================== USER ACTIONS ==================== */
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Active Status */
+
+.active-status {
+  color: #16a34a !important;
+  font-weight: bold;
+}
+
+/* Inactive Status */
+
+.inactive-status {
+  color: #dc2626 !important;
+  font-weight: bold;
+}
+
+/* ==================== ACTIVATE / DEACTIVATE BUTTONS ==================== */
+
+.activate-button,
+.deactivate-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.activate-button {
+  background: #16a34a;
+}
+
+.activate-button:hover {
+  background: #15803d;
+}
+
+.deactivate-button {
+  background: #dc2626;
+}
+
+.deactivate-button:hover {
+  background: #b91c1c;
+}
+
+/* ==================== SUPER ADMIN PROTECTION ==================== */
+
+.protected-user {
+  padding: 10px 14px;
+  background: #fef3c7;
+  color: #92400e !important;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* ==================== POST / COMMENT MANAGEMENT ==================== */
+
+.admin-post {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  margin-bottom: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  transition: box-shadow 0.2s ease;
+}
+
+.admin-post:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.admin-post-content {
+  flex: 1;
+}
+
+.admin-post-content h3 {
+  margin: 0 0 8px;
+  color: #333;
+}
+
+.admin-post-content p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.admin-post-content small {
+  color: #777;
+}
+
+/* ==================== POST IMAGE ==================== */
+
+.admin-post-image {
+  display: block;
+  max-width: 250px;
+  max-height: 200px;
+  margin: 10px 0;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* ==================== DELETE BUTTON ==================== */
+
+.delete-post-button {
+  padding: 9px 15px;
+  border: none;
+  border-radius: 7px;
+  background: #dc2626;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.delete-post-button:hover {
+  background: #b91c1c;
+}
+
+/* ==================== TABLET ==================== */
+
+@media (max-width: 800px) {
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-card {
+    padding: 30px 20px;
+  }
+}
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 700px) {
+  .admin-container {
+    padding: 25px 12px;
+  }
+
+  .admin-card {
+    padding: 25px 15px;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-tabs {
+    flex-direction: column;
+  }
+
+  .admin-tabs button {
+    width: 100%;
+  }
+
+  .admin-user {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .admin-actions {
+    width: 100%;
+  }
+
+  .activate-button,
+  .deactivate-button {
+    width: 100%;
+  }
+}
+
+/* ==================== SMALL MOBILE ==================== */
+
+@media (max-width: 400px) {
+  .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-card h1 {
+    font-size: 24px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+}
+
+/* ==================== POST RESPONSIVE ==================== */
+
+@media (max-width: 600px) {
+  .admin-post {
+    flex-direction: column;
+  }
+
+  .delete-post-button {
+    width: 100%;
+  }
+
+  .admin-post-image {
+    max-width: 100%;
+  }
+}

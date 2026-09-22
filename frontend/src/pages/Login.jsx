@@ -30,8 +30,7 @@ function Login() {
     if (!password) {
       newErrors.password = "Password is required";
     } else if (password.length < 8) {
-      newErrors.password =
-        "Password must be at least 8 characters";
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);
@@ -62,27 +61,29 @@ function Login() {
       }, 1500);
     } catch (error) {
       setErrors({
-        server:
-          error.response?.data?.message || "Login failed",
+        server: error.response?.data?.message || "Login failed",
       });
     }
   };
 
   return (
     <div className="login-container">
+      <button
+        type="button"
+        className="back-landing-button"
+        onClick={() => navigate("/")}
+      >
+        ← Back to Home Page
+      </button>
       <div className="login-card">
         <h1>Bolo India 🇮🇳</h1>
 
         <h2>Welcome Back</h2>
         <p>Login to your account</p>
 
-        {errors.server && (
-          <p className="login-error">{errors.server}</p>
-        )}
+        {errors.server && <p className="login-error">{errors.server}</p>}
 
-        {success && (
-          <p className="login-success">{success}</p>
-        )}
+        {success && <p className="login-success">{success}</p>}
 
         <form onSubmit={handleLogin}>
           {/* Email */}
@@ -93,9 +94,7 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          {errors.email && (
-            <p className="field-error">{errors.email}</p>
-          )}
+          {errors.email && <p className="field-error">{errors.email}</p>}
 
           {/* Password */}
           <div className="password-input">
@@ -108,33 +107,24 @@ function Login() {
 
             <button
               type="button"
-              onClick={() =>
-                setShowPassword(!showPassword)
-              }
+              onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? "🙈" : "👁️"}
             </button>
           </div>
 
-          {errors.password && (
-            <p className="field-error">
-              {errors.password}
-            </p>
-          )}
+          {errors.password && <p className="field-error">{errors.password}</p>}
 
           {/* Forgot Password */}
           <div className="forgot-password">
-            <Link to="/forgot-password">
-              Forgot Password?
-            </Link>
+            <Link to="/forgot-password">Forgot Password?</Link>
           </div>
 
           <button type="submit">Login</button>
         </form>
 
         <div className="login-register">
-          Don't have an account?{" "}
-          <Link to="/register">Register</Link>
+          Don't have an account? <Link to="/register">Register</Link>
         </div>
       </div>
     </div>

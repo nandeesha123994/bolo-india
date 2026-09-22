@@ -1,0 +1,198 @@
+.users-container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f4f7fb;
+}
+
+.users-card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.users-card h1 {
+  text-align: center;
+  color: #2563eb;
+  margin-bottom: 30px;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  margin-bottom: 15px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.user-item h3 {
+  margin: 0 0 5px;
+  color: #333;
+}
+
+.user-item p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.user-item button {
+  padding: 9px 16px;
+  margin-left: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.user-item button:hover {
+  background: #1d4ed8;
+}
+
+.user-item .unfollow-btn {
+  background: #dc2626;
+}
+
+.user-item .unfollow-btn:hover {
+  background: #b91c1c;
+}
+
+@media (max-width: 600px) {
+  .user-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .user-item button {
+    margin-left: 0;
+    margin-right: 8px;
+  }
+}
+
+/* ==================== SEARCH ==================== */
+
+.users-search {
+  width: 100%;
+  margin: 20px 0 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.users-search input {
+  width: 100%;
+  max-width: 600px;
+  padding: 13px 18px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #1f2937;
+
+  font-size: 15px;
+  outline: none;
+
+  box-sizing: border-box;
+  transition: all 0.25s ease;
+}
+
+.users-search input::placeholder {
+  color: #9ca3af;
+}
+
+.users-search input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* ==================== FOLLOW BUTTON ==================== */
+
+.follow-btn {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.follow-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* ==================== UNFOLLOW BUTTON ==================== */
+
+.unfollow-btn {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+
+  background: #e5e7eb;
+  color: #374151;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.unfollow-btn:hover {
+  background: #d1d5db;
+}
+
+/* ==================== USER ACTIONS ==================== */
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==================== NO USERS ==================== */
+
+.no-users {
+  text-align: center;
+  padding: 25px;
+  color: #6b7280;
+}
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 600px) {
+  .users-search input {
+    max-width: 100%;
+    font-size: 14px;
+    padding: 12px 15px;
+  }
+
+  .user-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .user-actions {
+    width: 100%;
+  }
+
+  .follow-btn,
+  .unfollow-btn {
+    width: 100%;
+  }
+}

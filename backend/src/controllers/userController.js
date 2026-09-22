@@ -1,6 +1,10 @@
 const prisma = require("../config/prisma");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../services/emailService");
+const { createNotification } = require("../services/notificationService");
+
+// ==================== REGISTER ====================
 
 const registerUser = async (req, res) => {
   try {
@@ -26,6 +30,47 @@ const registerUser = async (req, res) => {
       },
     });
 
+    // ==================== SEND WELCOME EMAIL ====================
+
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: "Welcome to Bolo India 🇮🇳",
+        text: `Welcome to Bolo India, ${user.name}! Your account has been created successfully.`,
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2>Welcome to Bolo India 🇮🇳</h2>
+
+            <p>Hello <strong>${user.name}</strong>,</p>
+
+            <p>
+              Your Bolo India account has been created successfully.
+            </p>
+
+            <p>
+              You can now log in and start sharing your thoughts,
+              ideas and moments with India.
+            </p>
+
+            <p>
+              Thank you for joining Bolo India!
+            </p>
+
+            <br />
+
+            <p>
+              Regards,<br />
+              <strong>Bolo India Team</strong>
+            </p>
+          </div>
+        `,
+      });
+
+      console.log(`Welcome email sent successfully to ${user.email}`);
+    } catch (emailError) {
+      console.error("Welcome email failed:", emailError);
+    }
+
     res.status(201).json({
       message: "User registered successfully",
       user: {
@@ -37,11 +82,14 @@ const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== LOGIN ====================
 
 const loginUser = async (req, res) => {
   try {
@@ -62,6 +110,12 @@ const loginUser = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         message: "Invalid email or password",
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        message: "Your account has been deactivated by the administrator",
       });
     }
 
@@ -88,11 +142,15 @@ const loginUser = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== PROFILE ====================
+
 const getProfile = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -119,11 +177,99 @@ const getProfile = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== UPDATE PROFILE PHOTO ====================
+
+const updateProfilePhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please select an image to upload",
+      });
+    }
+
+    const profileImage = `/uploads/${req.file.filename}`;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        profileImage,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        bio: true,
+        profileImage: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json({
+      message: "Profile photo updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error while updating profile photo",
+    });
+  }
+};
+
+// ==================== UPDATE PROFILE ====================
+
+const updateProfile = async (req, res) => {
+  try {
+    const { name, bio } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        message: "Name is required",
+      });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: req.user.id,
+      },
+      data: {
+        name: name.trim(),
+        bio: bio?.trim() || null,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        bio: true,
+        profileImage: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    res.status(500).json({
+      message: "Server error while updating profile",
+    });
+  }
+};
+
+// ==================== FOLLOW USER ====================
 
 const followUser = async (req, res) => {
   try {
@@ -168,17 +314,37 @@ const followUser = async (req, res) => {
       },
     });
 
+    // ==================== FOLLOW NOTIFICATION ====================
+
+    const follower = await prisma.user.findUnique({
+      where: {
+        id: followerId,
+      },
+      select: {
+        name: true,
+      },
+    });
+
+    await createNotification({
+      userId: followingId,
+      type: "FOLLOW",
+      message: `${follower?.name || "Someone"} started following you.`,
+    });
+
     res.status(201).json({
       message: "User followed successfully",
       follow,
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== UNFOLLOW USER ====================
 
 const unfollowUser = async (req, res) => {
   try {
@@ -214,11 +380,15 @@ const unfollowUser = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== GET FOLLOWERS ====================
+
 const getFollowers = async (req, res) => {
   try {
     const userId = Number(req.params.id);
@@ -254,11 +424,15 @@ const getFollowers = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== GET FOLLOWING ====================
+
 const getFollowing = async (req, res) => {
   try {
     const userId = Number(req.params.id);
@@ -273,7 +447,7 @@ const getFollowing = async (req, res) => {
       });
     }
 
-    const following = await prisma.follow.findMany({
+    const followingRecords = await prisma.follow.findMany({
       where: {
         followerId: userId,
       },
@@ -289,109 +463,117 @@ const getFollowing = async (req, res) => {
       },
     });
 
+    const following = followingRecords.map((follow) => follow.following);
+
     res.status(200).json({
       following,
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
+
+// ==================== GET ALL USERS ====================
+
 const getAllUsers = async (req, res) => {
   try {
+    const currentUserId = req.user.id;
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        isActive: true,
         createdAt: true,
+
+        followers: {
+          where: {
+            followerId: currentUserId,
+          },
+          select: {
+            id: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
+    const usersWithFollowStatus = users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+
+      isFollowing: user.followers.length > 0,
+    }));
+
     res.status(200).json({
-      users,
+      users: usersWithFollowStatus,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Get all users error:", error);
+
     res.status(500).json({
       message: "Server error",
     });
   }
 };
 
-const makeAdmin = async (req, res) => {
+// ==================== UPDATE USER ROLE ====================
+
+const updateUserRole = async (req, res) => {
   try {
     const userId = Number(req.params.id);
+    const { role } = req.body;
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // Roles that SUPER_ADMIN can assign
+    const allowedRoles = ["USER", "ADMIN", "CONTENT_MANAGER", "MODERATOR"];
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        role: "ADMIN",
-      },
-    });
-
-    res.status(200).json({
-      message: "User promoted to Admin successfully",
-      user: {
-        id: updatedUser.id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Server error",
-    });
-  }
-};
-
-const removeAdmin = async (req, res) => {
-  try {
-    const userId = Number(req.params.id);
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    if (user.role !== "ADMIN") {
+    // Check whether requested role is valid
+    if (!allowedRoles.includes(role)) {
       return res.status(400).json({
-        message: "User is not an Admin",
+        message: "Invalid role",
       });
     }
 
+    // Find target user
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Protect SUPER_ADMIN
+    if (user.role === "SUPER_ADMIN") {
+      return res.status(403).json({
+        message: "Super Admin role cannot be changed",
+      });
+    }
+
+    // Update role
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        role: "USER",
+        role,
       },
     });
 
     res.status(200).json({
-      message: "Admin access removed successfully",
+      message: `User role updated to ${role} successfully`,
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
@@ -408,4 +590,77 @@ const removeAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getProfile, followUser, unfollowUser,getFollowers,getFollowing,getAllUsers,makeAdmin,removeAdmin };
+// ==================== ACTIVATE / DEACTIVATE USER ====================
+
+const updateUserStatus = async (req, res) => {
+  try {
+    const userId = Number(req.params.id);
+    const { isActive } = req.body;
+
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({
+        message: "isActive must be true or false",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Super Admin cannot be deactivated
+    if (user.role === "SUPER_ADMIN") {
+      return res.status(403).json({
+        message: "Super Admin cannot be deactivated",
+      });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        isActive,
+      },
+    });
+
+    res.status(200).json({
+      message: isActive
+        ? "User activated successfully"
+        : "User deactivated successfully",
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        isActive: updatedUser.isActive,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+// ==================== EXPORTS ====================
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getProfile,
+  updateProfilePhoto,
+  followUser,
+  unfollowUser,
+  getFollowers,
+  getFollowing,
+  getAllUsers,
+  updateUserRole,
+  updateUserStatus,
+  updateProfile,
+};
