@@ -39,14 +39,30 @@ const createContactMessage = async (req, res) => {
 
 const getContactMessages = async (req, res) => {
   try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 5, 50);
+    const skip = (page - 1) * limit;
+
+    const totalMessages = await prisma.contactMessage.count();
+
     const messages = await prisma.contactMessage.findMany({
       orderBy: {
         createdAt: "desc",
       },
+      skip,
+      take: limit,
     });
 
     res.status(200).json({
       messages,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalMessages / limit),
+        totalMessages,
+        limit,
+        hasNextPage: page < Math.ceil(totalMessages / limit),
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error("Get contact messages error:", error);

@@ -32,6 +32,11 @@ const createPost = async (req, res) => {
     const image = imageFile ? `/uploads/${imageFile.filename}` : null;
     const video = videoFile ? `/uploads/${videoFile.filename}` : null;
 
+    const allowComments =
+      commentsEnabled === undefined
+        ? true
+        : commentsEnabled === "true" || commentsEnabled === true;
+
     // A post can have either an image or a video, not both
     if (image && video) {
       uploadedFiles.forEach((filePath) => {
@@ -54,8 +59,7 @@ const createPost = async (req, res) => {
         hashtags: hashtags || null,
         location: location || null,
         visibility: visibility || "PUBLIC",
-        commentsEnabled:
-          commentsEnabled !== undefined ? Boolean(commentsEnabled) : true,
+        commentsEnabled: allowComments,
         authorId: req.user.id,
       },
     });
@@ -83,10 +87,18 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
+    const hasPagination =
+      req.query.page !== undefined || req.query.limit !== undefined;
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 5, 50);
+    const skip = (page - 1) * limit;
+    const totalPosts = hasPagination ? await prisma.post.count() : null;
+
     const posts = await prisma.post.findMany({
       orderBy: {
         createdAt: "desc",
       },
+      ...(hasPagination && { skip, take: limit }),
       include: {
         author: {
           select: {
@@ -112,6 +124,70 @@ const getAllPosts = async (req, res) => {
 
     res.status(200).json({
       posts: postsWithAuthorProfile,
+      ...(hasPagination && {
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalPosts / limit),
+          totalPosts,
+          limit,
+          hasNextPage: page < Math.ceil(totalPosts / limit),
+          hasPreviousPage: page > 1,
+        },
+      }),
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+// ==================== GET ALL COMMENTS FOR ADMIN ====================
+
+const getAllCommentsForAdmin = async (req, res) => {
+  try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 5, 50);
+    const skip = (page - 1) * limit;
+    const totalComments = await prisma.comment.count();
+
+    const comments = await prisma.comment.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: limit,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profileImage: true,
+          },
+        },
+        post: {
+          select: {
+            id: true,
+            content: true,
+          },
+        },
+      },
+    });
+
+    const totalPages = Math.ceil(totalComments / limit);
+
+    res.status(200).json({
+      comments,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalComments,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -442,6 +518,7 @@ const deleteComment = async (req, res) => {
 module.exports = {
   createPost,
   getAllPosts,
+  getAllCommentsForAdmin,
   deletePost,
   updatePost,
   likePost,

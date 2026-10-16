@@ -14,6 +14,7 @@ import ModeratorDashboard from "./pages/ModeratorDashboard";
 import Support from "./pages/Support";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -102,6 +103,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

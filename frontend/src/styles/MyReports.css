@@ -89,3 +89,74 @@
   padding: 40px 20px;
   color: #666;
 }
+
+/* =========================================================
+   REPORTS PAGINATION
+========================================================= */
+
+.reports-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+
+  margin-top: 30px;
+  padding-top: 20px;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.reports-pagination button {
+  padding: 9px 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.reports-pagination button:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.reports-pagination button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+
+  cursor: not-allowed;
+}
+
+.reports-pagination span {
+  color: #374151;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .reports-pagination {
+    gap: 10px;
+  }
+
+  .reports-pagination button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .reports-pagination span {
+    font-size: 13px;
+  }
+}

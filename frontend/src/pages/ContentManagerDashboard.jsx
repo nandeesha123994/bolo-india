@@ -1,10 +1,31 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { getReports } from "../services/postService";
 import "../styles/ContentManagerDashboard.css";
 
 function ContentManagerDashboard() {
   const [posts, setPosts] = useState([]);
   const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalReports: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+  const [historyReports, setHistoryReports] = useState([]);
+  const [historyCurrentPage, setHistoryCurrentPage] = useState(1);
+  const [historyPagination, setHistoryPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalReports: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
   const [reportResponses, setReportResponses] = useState({});
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -24,24 +45,66 @@ function ContentManagerDashboard() {
 
   // ==================== LOAD REPORTS ====================
 
-  const loadReports = async () => {
+  const loadReports = async (page = 1) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/reports", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      setLoading(true);
 
-      setReports(response.data.reports || []);
+      const data = await getReports(page, 5);
+
+      setReports(data.reports || []);
+      setPagination(data.pagination);
+      setCurrentPage(page);
     } catch (error) {
       console.error("Failed to load reports:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadReportHistory = async () => {
+    try {
+      setLoading(true);
+
+      const firstPage = await getReports(1, 5);
+      let allReports = firstPage.reports || [];
+
+      for (let page = 2; page <= firstPage.pagination.totalPages; page += 1) {
+        const data = await getReports(page, 5);
+        allReports = [...allReports, ...(data.reports || [])];
+      }
+
+      const resolvedReports = allReports.filter(
+        (report) => report.status !== "PENDING",
+      );
+      const totalPages = Math.max(1, Math.ceil(resolvedReports.length / 5));
+
+      setHistoryReports(resolvedReports);
+      setHistoryCurrentPage(1);
+      setHistoryPagination({
+        currentPage: 1,
+        totalPages,
+        totalReports: resolvedReports.length,
+        limit: 5,
+        hasNextPage: totalPages > 1,
+        hasPreviousPage: false,
+      });
+    } catch (error) {
+      console.error("Failed to load report history:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     loadPosts();
-    loadReports();
+    loadReports(1);
   }, []);
+
+  useEffect(() => {
+    if (activeTab === "history") {
+      loadReportHistory();
+    }
+  }, [activeTab]);
 
   // ==================== DELETE POST ====================
 
@@ -64,7 +127,7 @@ function ContentManagerDashboard() {
       alert("Content removed successfully");
 
       loadPosts();
-      loadReports();
+      loadReports(1);
     } catch (error) {
       console.error(error);
 
@@ -107,7 +170,7 @@ function ContentManagerDashboard() {
         [reportId]: "",
       }));
 
-      loadReports();
+      loadReports(1);
     } catch (error) {
       console.error(error);
 
@@ -135,7 +198,72 @@ function ContentManagerDashboard() {
 
   const pendingReports = pendingReportList.length;
 
-  const reportHistory = reports.filter((report) => report.status !== "PENDING");
+  const reportHistory = historyReports.slice(
+    (historyCurrentPage - 1) * 5,
+    historyCurrentPage * 5,
+  );
+
+  const reportPagination = (
+    <div className="reports-pagination">
+      <button
+        onClick={() => loadReports(currentPage - 1)}
+        disabled={!pagination.hasPreviousPage || loading}
+      >
+        ← Previous
+      </button>
+
+      <span>
+        Page {pagination.currentPage} of {pagination.totalPages}
+      </span>
+
+      <button
+        onClick={() => loadReports(currentPage + 1)}
+        disabled={!pagination.hasNextPage || loading}
+      >
+        Next →
+      </button>
+    </div>
+  );
+
+  const historyPaginationControls = (
+    <div className="reports-pagination">
+      <button
+        onClick={() => {
+          const page = historyCurrentPage - 1;
+          setHistoryCurrentPage(page);
+          setHistoryPagination((previous) => ({
+            ...previous,
+            currentPage: page,
+            hasNextPage: page < previous.totalPages,
+            hasPreviousPage: page > 1,
+          }));
+        }}
+        disabled={!historyPagination.hasPreviousPage || loading}
+      >
+        ← Previous
+      </button>
+
+      <span>
+        Page {historyPagination.currentPage} of {historyPagination.totalPages}
+      </span>
+
+      <button
+        onClick={() => {
+          const page = historyCurrentPage + 1;
+          setHistoryCurrentPage(page);
+          setHistoryPagination((previous) => ({
+            ...previous,
+            currentPage: page,
+            hasNextPage: page < previous.totalPages,
+            hasPreviousPage: true,
+          }));
+        }}
+        disabled={!historyPagination.hasNextPage || loading}
+      >
+        Next →
+      </button>
+    </div>
+  );
 
   // ==================== UI ====================
 
@@ -209,7 +337,11 @@ function ContentManagerDashboard() {
           <div className="management-content">
             <h2 className="section-title">Reported Posts 🚩</h2>
 
-            {pendingReportList.length === 0 ? (
+            {loading ? (
+              <div className="reported-placeholder">
+                <p>Loading reports...</p>
+              </div>
+            ) : pendingReportList.length === 0 ? (
               <div className="reported-placeholder">
                 <h3>No pending reports</h3>
 
@@ -282,6 +414,8 @@ function ContentManagerDashboard() {
                 </div>
               ))
             )}
+
+            {pagination.totalPages > 1 && reportPagination}
           </div>
         )}
 
@@ -291,7 +425,11 @@ function ContentManagerDashboard() {
           <div className="management-content">
             <h2 className="section-title">📋 Report History</h2>
 
-            {reportHistory.length === 0 ? (
+            {loading ? (
+              <div className="reported-placeholder">
+                <p>Loading reports...</p>
+              </div>
+            ) : reportHistory.length === 0 ? (
               <div className="reported-placeholder">
                 <h3>No report history</h3>
 
@@ -343,6 +481,8 @@ function ContentManagerDashboard() {
                 </div>
               ))
             )}
+
+            {historyPagination.totalPages > 1 && historyPaginationControls}
           </div>
         )}
       </div>

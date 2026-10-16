@@ -13,14 +13,25 @@ function ContactMessages() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalMessages: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
 
-  const loadMessages = async () => {
+  const loadMessages = async (page = 1) => {
     try {
       setLoading(true);
       setError("");
 
-      const data = await getContactMessages();
+      const data = await getContactMessages(page, 5);
       setMessages(data.messages || []);
+      setCurrentPage(data.pagination?.currentPage || page);
+      setPagination(data.pagination);
     } catch (requestError) {
       setError(
         requestError.response?.data?.message ||
@@ -190,6 +201,33 @@ function ContactMessages() {
           })}
         </div>
       )}
+
+      {!loading &&
+        !error &&
+        pagination.totalPages > 1 &&
+        messages.length > 0 && (
+          <div className="contact-pagination">
+            <button
+              type="button"
+              onClick={() => loadMessages(currentPage - 1)}
+              disabled={!pagination.hasPreviousPage || loading}
+            >
+              ← Previous
+            </button>
+
+            <span>
+              Page {pagination.currentPage} of {pagination.totalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => loadMessages(currentPage + 1)}
+              disabled={!pagination.hasNextPage || loading}
+            >
+              Next →
+            </button>
+          </div>
+        )}
 
       {success && <p className="contact-success">{success}</p>}
     </section>

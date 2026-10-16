@@ -4,10 +4,10 @@ const API_URL = "http://localhost:5000/api/notifications";
 
 // ==================== GET NOTIFICATIONS ====================
 
-export const getNotifications = async () => {
+export const getNotifications = async (page = 1, limit = 5) => {
   const token = localStorage.getItem("token");
 
-  const response = await axios.get(API_URL, {
+  const response = await axios.get(`${API_URL}?page=${page}&limit=${limit}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -28,7 +28,7 @@ export const markNotificationAsRead = async (notificationId) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return response.data;
@@ -46,7 +46,7 @@ export const markAllNotificationsAsRead = async () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return response.data;

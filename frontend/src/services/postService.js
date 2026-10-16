@@ -77,11 +77,11 @@ export const createReport = async (postId, reason) => {
   return response.data;
 };
 
-export const getMyReports = async () => {
+export const getMyReports = async (page = 1, limit = 5) => {
   const token = localStorage.getItem("token");
 
   const response = await axios.get(
-    "http://localhost:5000/api/reports/my-reports",
+    `http://localhost:5000/api/reports/my-reports?page=${page}&limit=${limit}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -89,7 +89,22 @@ export const getMyReports = async () => {
     },
   );
 
-  return response.data.reports;
+  return response.data;
+};
+
+export const getReports = async (page = 1, limit = 5) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.get(
+    `http://localhost:5000/api/reports?page=${page}&limit=${limit}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  return response.data;
 };
 
 export const deletePost = async (postId) => {

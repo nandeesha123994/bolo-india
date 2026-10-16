@@ -296,6 +296,117 @@
   border-radius: 10px;
 }
 
+.support-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.support-pagination button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.support-pagination button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.support-pagination button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.support-pagination span {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.moderator-comment-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 15px;
+  padding: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.moderator-comment-card p {
+  margin: 8px 0;
+  color: #444;
+}
+
+.moderator-comment-card small {
+  color: #777;
+}
+
+.moderator-comment-card button {
+  padding: 9px 15px;
+  border: none;
+  border-radius: 7px;
+  background: #dc2626;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.moderator-comment-card button:hover {
+  background: #b91c1c;
+}
+
+.moderator-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.moderator-pagination button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.moderator-pagination button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.moderator-pagination button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.moderator-pagination span {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 900px) {
@@ -336,6 +447,40 @@
 
   .moderator-tabs button {
     width: 100%;
+  }
+
+  .support-pagination {
+    gap: 10px;
+  }
+
+  .support-pagination button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .support-pagination span {
+    font-size: 13px;
+  }
+
+  .moderator-comment-card {
+    flex-direction: column;
+  }
+
+  .moderator-comment-card button {
+    width: 100%;
+  }
+
+  .moderator-pagination {
+    gap: 10px;
+  }
+
+  .moderator-pagination button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .moderator-pagination span {
+    font-size: 13px;
   }
 
   .moderator-comment {

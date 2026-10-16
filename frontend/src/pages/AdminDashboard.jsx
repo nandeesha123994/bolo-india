@@ -2,102 +2,174 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/AdminDashboard.css";
 
+const API_BASE_URL = "http://localhost:5000/api";
+
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
+
+  const [usersPagination, setUsersPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalUsers: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+  const [postsPagination, setPostsPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalPosts: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+  const [commentsPagination, setCommentsPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalComments: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+  const [roleCounts, setRoleCounts] = useState({
+    ADMIN: 0,
+    CONTENT_MANAGER: 0,
+    MODERATOR: 0,
+  });
+
   const [activeTab, setActiveTab] = useState("users");
 
   const token = localStorage.getItem("token");
 
+  const authConfig = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
   // ==================== LOAD USERS ====================
 
-  const loadUsers = async () => {
+  const loadUsers = async (page = 1) => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/users/admin/users",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        `${API_BASE_URL}/users/admin/users?page=${page}&limit=5`,
+        authConfig,
+      );
+
+      const userList = response.data.users || [];
+
+      setUsers(userList);
+
+      setUsersPagination(
+        response.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalUsers: userList.length,
+          limit: 5,
+          hasNextPage: false,
+          hasPreviousPage: false,
         },
       );
 
-      setUsers(response.data.users || []);
+      setRoleCounts({
+        ADMIN: response.data.roleCounts?.ADMIN ?? 0,
+        CONTENT_MANAGER: response.data.roleCounts?.CONTENT_MANAGER ?? 0,
+        MODERATOR: response.data.roleCounts?.MODERATOR ?? 0,
+      });
     } catch (error) {
-      console.error("Failed to load users:", error);
+      console.error(
+        "Failed to load users:",
+        error.response?.data || error.message,
+      );
     }
   };
 
   // ==================== LOAD POSTS ====================
 
-  const loadPosts = async () => {
+  const loadPosts = async (page = 1) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/posts");
+      const response = await axios.get(
+        `${API_BASE_URL}/posts?page=${page}&limit=5`,
+      );
 
-      setPosts(response.data.posts || []);
+      const postList = response.data.posts || [];
+
+      setPosts(postList);
+
+      setPostsPagination(
+        response.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalPosts: postList.length,
+          limit: 5,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      );
     } catch (error) {
-      console.error("Failed to load posts:", error);
+      console.error(
+        "Failed to load posts:",
+        error.response?.data || error.message,
+      );
     }
   };
 
   // ==================== LOAD COMMENTS ====================
 
-  const loadComments = async (currentPosts) => {
+  const loadComments = async (page = 1) => {
     try {
-      const allComments = [];
+      const response = await axios.get(
+        `${API_BASE_URL}/posts/admin/comments?page=${page}&limit=5`,
+        authConfig,
+      );
 
-      for (const post of currentPosts) {
-        const response = await axios.get(
-          `http://localhost:5000/api/posts/${post.id}/comments`,
-        );
+      const commentList = (response.data.comments || []).map((comment) => ({
+        ...comment,
+        postId: comment.post?.id,
+        postContent: comment.post?.content,
+      }));
 
-        const postComments = response.data.comments || [];
+      setComments(commentList);
 
-        postComments.forEach((comment) => {
-          allComments.push({
-            ...comment,
-            postId: post.id,
-            postContent: post.content,
-          });
-        });
-      }
-
-      setComments(allComments);
+      setCommentsPagination(
+        response.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalComments: commentList.length,
+          limit: 5,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      );
     } catch (error) {
-      console.error("Failed to load comments:", error);
+      console.error(
+        "Failed to load comments:",
+        error.response?.data || error.message,
+      );
     }
   };
 
   // ==================== LOAD DATA ====================
 
   useEffect(() => {
-    loadUsers();
-    loadPosts();
+    loadUsers(1);
+    loadPosts(1);
+    loadComments(1);
   }, []);
 
-  useEffect(() => {
-    if (posts.length > 0) {
-      loadComments(posts);
-    } else {
-      setComments([]);
-    }
-  }, [posts]);
-
-  // ==================== ACTIVATE / DEACTIVATE ====================
+  // ==================== ACTIVATE / DEACTIVATE USER ====================
 
   const updateUserStatus = async (userId, isActive) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/users/admin/status/${userId}`,
-        {
-          isActive: !isActive,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        `${API_BASE_URL}/users/admin/status/${userId}`,
+        { isActive: !isActive },
+        authConfig,
       );
 
       alert(
@@ -106,9 +178,9 @@ function AdminDashboard() {
           : "User deactivated successfully",
       );
 
-      loadUsers();
+      await loadUsers(usersPagination.currentPage);
     } catch (error) {
-      console.error(error);
+      console.error("Update user status error:", error);
 
       alert(error.response?.data?.message || "Failed to update user status");
     }
@@ -121,22 +193,16 @@ function AdminDashboard() {
       "Are you sure you want to delete this post?",
     );
 
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/posts/admin/${postId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.delete(`${API_BASE_URL}/posts/admin/${postId}`, authConfig);
 
       alert("Post deleted successfully");
 
-      loadPosts();
+      await loadPosts(postsPagination.currentPage);
     } catch (error) {
-      console.error(error);
+      console.error("Delete post error:", error);
 
       alert(error.response?.data?.message || "Failed to delete post");
     }
@@ -149,27 +215,19 @@ function AdminDashboard() {
       "Are you sure you want to delete this comment?",
     );
 
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/posts/comment/${commentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        `${API_BASE_URL}/posts/comment/${commentId}`,
+        authConfig,
       );
 
       alert("Comment deleted successfully");
 
-      setComments((previousComments) =>
-        previousComments.filter((comment) => comment.id !== commentId),
-      );
+      await loadComments(commentsPagination.currentPage);
     } catch (error) {
-      console.error(error);
+      console.error("Delete comment error:", error);
 
       alert(error.response?.data?.message || "Failed to delete comment");
     }
@@ -177,17 +235,17 @@ function AdminDashboard() {
 
   // ==================== STATISTICS ====================
 
-  const totalUsers = users.length;
+  const totalUsers = usersPagination?.totalUsers ?? users.length;
 
-  const totalAdmins = users.filter((user) => user.role === "ADMIN").length;
+  const totalAdmins = roleCounts?.ADMIN ?? 0;
 
-  const totalContentManagers = users.filter(
-    (user) => user.role === "CONTENT_MANAGER",
-  ).length;
+  const totalContentManagers = roleCounts?.CONTENT_MANAGER ?? 0;
 
-  const totalModerators = users.filter(
-    (user) => user.role === "MODERATOR",
-  ).length;
+  const totalModerators = roleCounts?.MODERATOR ?? 0;
+
+  const totalPosts = postsPagination?.totalPosts ?? posts.length;
+
+  const totalComments = commentsPagination?.totalComments ?? comments.length;
 
   // ==================== UI ====================
 
@@ -198,7 +256,7 @@ function AdminDashboard() {
 
         <p className="admin-description">User and platform management</p>
 
-        {/* ==================== STATISTICS ==================== */}
+        {/* STATISTICS */}
 
         <div className="admin-stats">
           <div className="stat-card">
@@ -222,17 +280,17 @@ function AdminDashboard() {
           </div>
 
           <div className="stat-card">
-            <h2>{posts.length}</h2>
+            <h2>{totalPosts}</h2>
             <p>Total Posts</p>
           </div>
 
           <div className="stat-card">
-            <h2>{comments.length}</h2>
+            <h2>{totalComments}</h2>
             <p>Total Comments</p>
           </div>
         </div>
 
-        {/* ==================== MANAGEMENT TABS ==================== */}
+        {/* MANAGEMENT TABS */}
 
         <div className="admin-tabs">
           <button
@@ -257,7 +315,7 @@ function AdminDashboard() {
           </button>
         </div>
 
-        {/* ==================== USER MANAGEMENT ==================== */}
+        {/* USER MANAGEMENT */}
 
         {activeTab === "users" && (
           <div className="management-content">
@@ -270,11 +328,8 @@ function AdminDashboard() {
                 <div className="admin-user" key={user.id}>
                   <div>
                     <h3>{user.name}</h3>
-
                     <p>{user.email}</p>
-
                     <span>Role: {user.role}</span>
-
                     <br />
 
                     <span
@@ -305,10 +360,17 @@ function AdminDashboard() {
                 </div>
               ))
             )}
+
+            {usersPagination?.totalPages > 1 && (
+              <PaginationControls
+                pagination={usersPagination}
+                onPageChange={loadUsers}
+              />
+            )}
           </div>
         )}
 
-        {/* ==================== POST MANAGEMENT ==================== */}
+        {/* POST MANAGEMENT */}
 
         {activeTab === "posts" && (
           <div className="management-content">
@@ -344,10 +406,17 @@ function AdminDashboard() {
                 </div>
               ))
             )}
+
+            {postsPagination?.totalPages > 1 && (
+              <PaginationControls
+                pagination={postsPagination}
+                onPageChange={loadPosts}
+              />
+            )}
           </div>
         )}
 
-        {/* ==================== COMMENT MANAGEMENT ==================== */}
+        {/* COMMENT MANAGEMENT */}
 
         {activeTab === "comments" && (
           <div className="management-content">
@@ -363,7 +432,7 @@ function AdminDashboard() {
 
                     <p>{comment.content}</p>
 
-                    <small>On Post #{comment.postId}</small>
+                    <small>On Post #{comment.postId ?? "N/A"}</small>
                   </div>
 
                   <button
@@ -375,9 +444,45 @@ function AdminDashboard() {
                 </div>
               ))
             )}
+
+            {commentsPagination?.totalPages > 1 && (
+              <PaginationControls
+                pagination={commentsPagination}
+                onPageChange={loadComments}
+              />
+            )}
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ==================== PAGINATION ====================
+
+function PaginationControls({ pagination, onPageChange }) {
+  const currentPage = pagination?.currentPage ?? 1;
+  const totalPages = pagination?.totalPages ?? 1;
+
+  return (
+    <div className="admin-pagination">
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={!pagination?.hasPreviousPage}
+      >
+        ← Previous
+      </button>
+
+      <span>
+        Page {currentPage} of {totalPages}
+      </span>
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={!pagination?.hasNextPage}
+      >
+        Next →
+      </button>
     </div>
   );
 }

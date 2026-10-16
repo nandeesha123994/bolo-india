@@ -14,6 +14,21 @@ export const getPostComments = async (postId) => {
   return response.data.comments;
 };
 
+export const getModeratorComments = async (page = 1, limit = 5) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.get(
+    `${POSTS_API}/admin/comments?page=${page}&limit=${limit}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  return response.data;
+};
+
 export const deleteCommentByModerator = async (commentId) => {
   const token = localStorage.getItem("token");
 
@@ -26,16 +41,19 @@ export const deleteCommentByModerator = async (commentId) => {
   return response.data;
 };
 
-export const getSupportMessages = async () => {
+export const getSupportMessages = async (page = 1, limit = 5) => {
   const token = localStorage.getItem("token");
 
-  const response = await axios.get("http://localhost:5000/api/support", {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await axios.get(
+    `http://localhost:5000/api/support?page=${page}&limit=${limit}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
-  return response.data.messages;
+  return response.data;
 };
 
 export const replyToSupportMessage = async (messageId, reply) => {

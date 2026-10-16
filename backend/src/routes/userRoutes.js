@@ -9,11 +9,13 @@ const {
   loginUser,
   getProfile,
   updateProfilePhoto,
+  createUserBySuperAdmin,
   followUser,
   unfollowUser,
   getFollowers,
   getFollowing,
   getAllUsers,
+  getAdminUsers,
   updateUserRole,
   updateUserStatus,
   updateProfile,
@@ -41,6 +43,14 @@ router.post("/forgot-password", forgotPassword);
 
 // Reset password
 router.post("/reset-password/:token", resetPassword);
+
+// ONLY SUPER_ADMIN can register users through the dashboard
+router.post(
+  "/admin/register",
+  authMiddleware,
+  superAdminMiddleware,
+  createUserBySuperAdmin,
+);
 
 // ==================== PROFILE ====================
 
@@ -84,11 +94,11 @@ router.get("/:id/following", getFollowing);
 
 // ==================== USERS ====================
 
-// Normal logged-in users can see people
+// People tab: show all users without pagination
 router.get("/all", authMiddleware, getAllUsers);
 
-// Admin and Super Admin can access admin user list
-router.get("/admin/users", authMiddleware, adminMiddleware, getAllUsers);
+// Admin Dashboard: show users with pagination
+router.get("/admin/users", authMiddleware, adminMiddleware, getAdminUsers);
 
 // ==================== ROLE MANAGEMENT ====================
 

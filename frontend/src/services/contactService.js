@@ -8,8 +8,11 @@ const getAuthConfig = () => ({
   },
 });
 
-export const getContactMessages = async () => {
-  const response = await axios.get(API_URL, getAuthConfig());
+export const getContactMessages = async (page = 1, limit = 5) => {
+  const response = await axios.get(
+    `${API_URL}?page=${page}&limit=${limit}`,
+    getAuthConfig(),
+  );
 
   return response.data;
 };

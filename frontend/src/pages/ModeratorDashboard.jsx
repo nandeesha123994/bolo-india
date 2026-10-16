@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   getModeratorPosts,
-  getPostComments,
+  getModeratorComments,
   deleteCommentByModerator,
   getSupportMessages,
   replyToSupportMessage,
@@ -12,17 +12,31 @@ import "../styles/ModeratorDashboard.css";
 
 function ModeratorDashboard() {
   const [posts, setPosts] = useState([]);
-  const [comments, setComments] = useState({});
   const [loading, setLoading] = useState(true);
 
   const [supportMessages, setSupportMessages] = useState([]);
+  const [supportPage, setSupportPage] = useState(1);
+  const [supportPagination, setSupportPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalMessages: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+  const [moderatorComments, setModeratorComments] = useState([]);
+  const [commentsPage, setCommentsPage] = useState(1);
+  const [commentsPagination, setCommentsPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalComments: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
   const [replyText, setReplyText] = useState({});
 
   const [activeTab, setActiveTab] = useState("overview");
-
-  useEffect(() => {
-    loadModeratorData();
-  }, []);
 
   const loadModeratorData = async () => {
     try {
@@ -30,19 +44,16 @@ function ModeratorDashboard() {
       const data = await getModeratorPosts();
       setPosts(data);
 
-      // Load comments for each post
-      for (const post of data) {
-        const postComments = await getPostComments(post.id);
-
-        setComments((prev) => ({
-          ...prev,
-          [post.id]: postComments,
-        }));
-      }
+      const commentsData = await getModeratorComments(1, 5);
+      setModeratorComments(commentsData.comments || []);
+      setCommentsPage(commentsData.pagination?.currentPage || 1);
+      setCommentsPagination(commentsData.pagination);
 
       // Load support messages
-      const supportData = await getSupportMessages();
-      setSupportMessages(supportData);
+      const supportData = await getSupportMessages(1, 5);
+      setSupportMessages(supportData.messages || []);
+      setSupportPage(supportData.pagination?.currentPage || 1);
+      setSupportPagination(supportData.pagination);
     } catch (error) {
       console.error("Failed to load moderator data:", error);
     } finally {
@@ -50,7 +61,37 @@ function ModeratorDashboard() {
     }
   };
 
-  const handleDeleteComment = async (commentId, postId) => {
+  useEffect(() => {
+    const timeoutId = window.setTimeout(loadModeratorData, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  const loadCommentsPage = async (page) => {
+    try {
+      const commentsData = await getModeratorComments(page, 5);
+
+      setModeratorComments(commentsData.comments || []);
+      setCommentsPage(commentsData.pagination?.currentPage || page);
+      setCommentsPagination(commentsData.pagination);
+    } catch (error) {
+      console.error("Failed to load comments:", error);
+    }
+  };
+
+  const loadSupportPage = async (page) => {
+    try {
+      const supportData = await getSupportMessages(page, 5);
+
+      setSupportMessages(supportData.messages || []);
+      setSupportPage(supportData.pagination?.currentPage || page);
+      setSupportPagination(supportData.pagination);
+    } catch (error) {
+      console.error("Failed to load support messages:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this comment?",
     );
@@ -62,10 +103,9 @@ function ModeratorDashboard() {
     try {
       await deleteCommentByModerator(commentId);
 
-      setComments((prev) => ({
-        ...prev,
-        [postId]: prev[postId].filter((comment) => comment.id !== commentId),
-      }));
+      setModeratorComments((previousComments) =>
+        previousComments.filter((comment) => comment.id !== commentId),
+      );
 
       alert("Comment deleted successfully");
     } catch (error) {
@@ -109,12 +149,9 @@ function ModeratorDashboard() {
 
   const totalPosts = posts.length;
 
-  const totalComments = Object.values(comments).reduce(
-    (total, postComments) => total + (postComments?.length || 0),
-    0,
-  );
+  const totalComments = commentsPagination.totalComments;
 
-  const totalSupportMessages = supportMessages.length;
+  const totalSupportMessages = supportPagination.totalMessages;
 
   const pendingSupportMessages = supportMessages.filter(
     (message) => message.status === "PENDING",
@@ -125,7 +162,7 @@ function ModeratorDashboard() {
       <div className="moderator-dashboard">
         <div className="moderator-container">
           <div className="moderator-header">
-            <h1>Bolo India - Moderator Dashboard 🛡️</h1>
+            <h1>Moderator Dashboard 🛡️</h1>
 
             <p>Loading moderator dashboard...</p>
           </div>
@@ -140,7 +177,7 @@ function ModeratorDashboard() {
         {/* ==================== HEADER ==================== */}
 
         <div className="moderator-header">
-          <h1>Bolo India - Moderator Dashboard 🛡️</h1>
+          <h1>Moderator Dashboard 🛡️</h1>
 
           <p>Manage comments and support user messages.</p>
         </div>
@@ -206,36 +243,47 @@ function ModeratorDashboard() {
           <div className="moderator-section">
             <h2>🗑️ Comment Moderation</h2>
 
-            {posts.length === 0 ? (
-              <p className="moderator-empty">No posts available.</p>
+            {moderatorComments.length === 0 ? (
+              <p className="moderator-empty">No comments available.</p>
             ) : (
-              posts.map((post) => (
-                <div key={post.id} className="moderator-post">
-                  <h3>{post.content}</h3>
+              moderatorComments.map((comment) => (
+                <div key={comment.id} className="moderator-comment-card">
+                  <div>
+                    <strong>{comment.user?.name || "User"}</strong>
 
-                  {comments[post.id]?.length > 0 ? (
-                    comments[post.id].map((comment) => (
-                      <div key={comment.id} className="moderator-comment">
-                        <div>
-                          <strong>{comment.user?.name || "User"}</strong>
+                    <p>{comment.content}</p>
 
-                          <p>{comment.content}</p>
-                        </div>
+                    <small>On Post #{comment.post?.id}</small>
+                  </div>
 
-                        <button
-                          onClick={() =>
-                            handleDeleteComment(comment.id, post.id)
-                          }
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="moderator-empty">No comments on this post.</p>
-                  )}
+                  <button onClick={() => handleDeleteComment(comment.id)}>
+                    🗑️ Delete
+                  </button>
                 </div>
               ))
+            )}
+
+            {commentsPagination.totalPages > 1 && (
+              <div className="moderator-pagination">
+                <button
+                  onClick={() => loadCommentsPage(commentsPage - 1)}
+                  disabled={!commentsPagination.hasPreviousPage}
+                >
+                  ← Previous
+                </button>
+
+                <span>
+                  Page {commentsPagination.currentPage} of{" "}
+                  {commentsPagination.totalPages}
+                </span>
+
+                <button
+                  onClick={() => loadCommentsPage(commentsPage + 1)}
+                  disabled={!commentsPagination.hasNextPage}
+                >
+                  Next →
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -312,6 +360,29 @@ function ModeratorDashboard() {
                   </div>
                 </div>
               ))
+            )}
+
+            {supportPagination.totalPages > 1 && (
+              <div className="support-pagination">
+                <button
+                  onClick={() => loadSupportPage(supportPage - 1)}
+                  disabled={!supportPagination.hasPreviousPage}
+                >
+                  ← Previous
+                </button>
+
+                <span>
+                  Page {supportPagination.currentPage} of{" "}
+                  {supportPagination.totalPages}
+                </span>
+
+                <button
+                  onClick={() => loadSupportPage(supportPage + 1)}
+                  disabled={!supportPagination.hasNextPage}
+                >
+                  Next →
+                </button>
+              </div>
             )}
           </div>
         )}

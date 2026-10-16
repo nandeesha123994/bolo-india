@@ -373,3 +373,362 @@
   color: #64748b;
   margin: 10px 0;
 }
+
+.profile-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.profile-pagination button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-pagination button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.profile-pagination button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.profile-pagination span {
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .profile-pagination {
+    gap: 8px;
+  }
+
+  .profile-pagination button {
+    padding: 8px 10px;
+  }
+}
+
+/* ==================== INSTAGRAM-STYLE MY POSTS ==================== */
+
+.my-posts-section {
+  width: 100%;
+  max-width: 1000px;
+  margin: 35px auto 80px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.my-posts-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 0;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.my-posts-heading h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 22px;
+}
+
+.my-posts-heading span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.my-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.my-post-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.my-post-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-post-text-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #dbeafe;
+  color: #1e3a8a;
+  text-align: center;
+}
+
+.my-post-text-tile p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+}
+
+.my-post-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: rgba(15, 23, 42, 0.72);
+  color: white;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.my-post-tile:hover .my-post-overlay {
+  opacity: 1;
+}
+
+.my-post-overlay p {
+  display: -webkit-box;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.my-post-overlay span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.posts-message {
+  padding: 30px 10px;
+  color: #64748b;
+  text-align: center;
+}
+
+.posts-error {
+  color: #dc2626;
+}
+
+.posts-empty-state {
+  padding: 45px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: white;
+  text-align: center;
+}
+
+.posts-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 65px;
+  height: 65px;
+  margin: 0 auto 15px;
+  border: 2px solid #334155;
+  border-radius: 50%;
+  color: #334155;
+  font-size: 35px;
+}
+
+.posts-empty-state h3 {
+  margin: 0 0 8px;
+  color: #1e293b;
+}
+
+.posts-empty-state p {
+  color: #64748b;
+}
+
+.posts-empty-state a {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.posts-empty-state a:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 600px) {
+  .my-posts-section {
+    padding: 0;
+    margin-top: 25px;
+  }
+
+  .my-posts-grid {
+    gap: 3px;
+  }
+
+  .my-posts-heading {
+    padding: 15px 5px;
+  }
+
+  .my-posts-heading h2 {
+    font-size: 19px;
+  }
+
+  .my-post-overlay {
+    display: none;
+  }
+}
+/* VIDEO POPUP */
+
+.video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.video-modal-player {
+  width: 100%;
+  max-width: 850px;
+  max-height: 85vh;
+  object-fit: contain;
+  background: #000;
+  border-radius: 10px;
+}
+
+.video-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+/* Clickable post media */
+.my-post-media {
+  cursor: pointer;
+}
+
+/* Full-screen photo/video popup */
+.video-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px 20px;
+  z-index: 9999;
+}
+
+.video-modal-player {
+  display: block;
+  max-width: 90vw;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.video-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  z-index: 10000;
+  color: white;
+  background: transparent;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+/* Ensure post media receives clicks */
+.my-post-tile {
+  position: relative;
+}
+
+.my-post-media {
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+
+/* Keep the post overlay from blocking media clicks */
+.my-post-overlay {
+  pointer-events: none;
+}
+
+/* Full-screen popup */
+.video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px 20px;
+}
+
+.video-modal-player {
+  display: block;
+  max-width: 90vw;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.video-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  z-index: 100000;
+  color: white;
+  background: #333;
+  border: none;
+  border-radius: 50%;
+  padding: 8px 12px;
+  font-size: 24px;
+  cursor: pointer;
+}

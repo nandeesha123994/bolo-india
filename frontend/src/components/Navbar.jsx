@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/Navbar.css";
 
 import {
@@ -12,109 +12,155 @@ function Navbar() {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // ==================== GET NOTIFICATIONS ====================
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalNotifications: 0,
+    unreadNotifications: 0,
+    limit: 5,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+  const loadNotifications = async (page = 1) => {
+    try {
+      const data = await getNotifications(page, 5);
+
+      setNotifications(data.notifications || []);
+
+      setPagination(
+        data.pagination || {
+          currentPage: 1,
+          totalPages: 1,
+          totalNotifications: 0,
+          unreadNotifications: 0,
+          limit: 5,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      );
+
+      setCurrentPage(page);
+      setUnreadCount(data.pagination?.unreadNotifications || 0);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  };
 
   useEffect(() => {
-    if (!token) {
-      return;
+    if (token) {
+      loadNotifications(1);
     }
-
-    const fetchNotifications = async () => {
-      try {
-        const data = await getNotifications();
-        setNotifications(data.notifications || []);
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
-      }
-    };
-
-    fetchNotifications();
   }, [token]);
-
-  // ==================== LOGOUT ====================
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     navigate("/login");
   };
 
-  // ==================== MARK ONE AS READ ====================
-
   const handleNotificationClick = async (notificationId) => {
     try {
+      const notification = notifications.find(
+        (item) => item.id === notificationId,
+      );
+
+      const wasUnread = notification && !notification.isRead;
+
       await markNotificationAsRead(notificationId);
 
-      setNotifications((previousNotifications) =>
-        previousNotifications.map((notification) =>
-          notification.id === notificationId
-            ? { ...notification, isRead: true }
-            : notification,
+      setNotifications((previous) =>
+        previous.map((item) =>
+          item.id === notificationId ? { ...item, isRead: true } : item,
         ),
       );
+
+      if (wasUnread) {
+        setUnreadCount((previous) => Math.max(0, previous - 1));
+      }
     } catch (error) {
       console.error("Failed to mark notification as read:", error);
     }
   };
 
-  // ==================== MARK ALL AS READ ====================
-
   const handleMarkAllAsRead = async () => {
     try {
       await markAllNotificationsAsRead();
 
-      setNotifications((previousNotifications) =>
-        previousNotifications.map((notification) => ({
-          ...notification,
-          isRead: true,
-        })),
+      setNotifications((previous) =>
+        previous.map((item) => ({ ...item, isRead: true })),
       );
+
+      setUnreadCount(0);
+
+      setPagination((previous) => ({
+        ...previous,
+        unreadNotifications: 0,
+      }));
     } catch (error) {
       console.error("Failed to mark all notifications as read:", error);
     }
   };
 
-  // ==================== UNREAD COUNT ====================
-
-  const unreadCount = notifications.filter(
-    (notification) => !notification.isRead,
-  ).length;
-
   const canAccessDashboard =
     user &&
-    (user.role === "ADMIN" ||
-      user.role === "SUPER_ADMIN" ||
-      user.role === "CONTENT_MANAGER" ||
-      user.role === "MODERATOR");
+    ["ADMIN", "SUPER_ADMIN", "CONTENT_MANAGER", "MODERATOR"].includes(
+      user.role,
+    );
+
+  // Automatically highlights the current route
+  const navLinkClass = ({ isActive }) => `nav-link${isActive ? " active" : ""}`;
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">🇮🇳 Bolo India</div>
+      <div
+        className="navbar-logo"
+        onClick={() => navigate(token ? "/home" : "/")}
+      >
+        🇮🇳 Bolo India
+      </div>
 
       <div className="navbar-links">
-        <Link to="/home">Home</Link>
+        <NavLink to="/home" end className={navLinkClass}>
+          Home
+        </NavLink>
 
-        {token && <Link to="/profile">Profile</Link>}
+        {token && (
+          <>
+            <NavLink to="/profile" className={navLinkClass}>
+              Profile
+            </NavLink>
 
-        {token && <Link to="/users">People</Link>}
+            <NavLink to="/users" className={navLinkClass}>
+              People
+            </NavLink>
 
-        {token && <Link to="/my-reports">My Reports</Link>}
+            <NavLink to="/my-reports" className={navLinkClass}>
+              My Reports
+            </NavLink>
 
-        {token && canAccessDashboard && <Link to="/admin">Dashboard</Link>}
+            {canAccessDashboard && (
+              <NavLink to="/admin" className={navLinkClass}>
+                Dashboard
+              </NavLink>
+            )}
+          </>
+        )}
 
-        {/* ==================== NOTIFICATIONS ==================== */}
-
+        {/* Notifications */}
         {token && (
           <div className="notification-container">
             <button
               className="notification-button"
-              onClick={() => setShowNotifications(!showNotifications)}
+              onClick={() => setShowNotifications((previous) => !previous)}
+              aria-label="Notifications"
             >
               🔔
               {unreadCount > 0 && (
@@ -137,45 +183,80 @@ function Navbar() {
                 {notifications.length === 0 ? (
                   <p className="no-notifications">No notifications yet.</p>
                 ) : (
-                  <div className="notification-list">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`notification-item ${
-                          !notification.isRead ? "unread" : ""
-                        }`}
-                        onClick={() => handleNotificationClick(notification.id)}
-                      >
-                        <span className="notification-icon">
-                          {notification.type === "LIKE" && "❤️"}
-                          {notification.type === "COMMENT" && "💬"}
-                          {notification.type === "FOLLOW" && "👤"}
+                  <>
+                    <div className="notification-list">
+                      {notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`notification-item ${
+                            !notification.isRead ? "unread" : ""
+                          }`}
+                          onClick={() =>
+                            handleNotificationClick(notification.id)
+                          }
+                        >
+                          <span className="notification-icon">
+                            {notification.type === "LIKE" && "❤️"}
+                            {notification.type === "COMMENT" && "💬"}
+                            {notification.type === "FOLLOW" && "👤"}
+                            {notification.type === "ROLE_UPDATE" && "🔐"}
+                          </span>
+
+                          <div className="notification-content">
+                            <p>{notification.message}</p>
+                            <small>
+                              {new Date(
+                                notification.createdAt,
+                              ).toLocaleString()}
+                            </small>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {pagination.totalPages > 1 && (
+                      <div className="notification-pagination">
+                        <button
+                          onClick={() => loadNotifications(currentPage - 1)}
+                          disabled={!pagination.hasPreviousPage}
+                        >
+                          ←
+                        </button>
+
+                        <span>
+                          Page {pagination.currentPage} of{" "}
+                          {pagination.totalPages}
                         </span>
 
-                        <div className="notification-content">
-                          <p>{notification.message}</p>
-
-                          <small>
-                            {new Date(notification.createdAt).toLocaleString()}
-                          </small>
-                        </div>
+                        <button
+                          onClick={() => loadNotifications(currentPage + 1)}
+                          disabled={!pagination.hasNextPage}
+                        >
+                          →
+                        </button>
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
           </div>
         )}
 
+        {/* Login and Register */}
         {!token && (
           <>
-            <Link to="/login">Login</Link>
+            <NavLink to="/login" className={navLinkClass}>
+              Login
+            </NavLink>
 
-            <Link to="/register">Register</Link>
+            <NavLink to="/register" className={navLinkClass}>
+              Register
+            </NavLink>
           </>
         )}
 
+        {/* Logout */}
         {token && <button onClick={handleLogout}>Logout</button>}
       </div>
     </nav>

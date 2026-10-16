@@ -276,6 +276,46 @@
   background: #b91c1c;
 }
 
+/* ==================== PAGINATION ==================== */
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.admin-pagination button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-pagination button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.admin-pagination button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.admin-pagination span {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
 /* ==================== TABLET ==================== */
 
 @media (max-width: 800px) {
@@ -356,5 +396,18 @@
 
   .admin-post-image {
     max-width: 100%;
+  }
+
+  .admin-pagination {
+    gap: 10px;
+  }
+
+  .admin-pagination button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .admin-pagination span {
+    font-size: 13px;
   }
 }

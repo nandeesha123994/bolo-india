@@ -1,10 +1,12 @@
 const adminMiddleware = require("../middleware/adminMiddleware");
+const moderatorMiddleware = require("../middleware/moderatorMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 const express = require("express");
 
 const {
   createPost,
   getAllPosts,
+  getAllCommentsForAdmin,
   deletePost,
   updatePost,
   likePost,
@@ -27,6 +29,12 @@ router.post(
   createPost,
 );
 router.get("/", getAllPosts);
+router.get(
+  "/admin/comments",
+  authMiddleware,
+  moderatorMiddleware,
+  getAllCommentsForAdmin,
+);
 
 router.delete("/admin/:id", authMiddleware, adminMiddleware, deletePost);
 

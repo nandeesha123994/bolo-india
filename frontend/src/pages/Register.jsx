@@ -1,6 +1,6 @@
 import "../styles/Register.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { registerUser } from "../services/authService";
 
 function Register() {
@@ -14,6 +14,8 @@ function Register() {
 
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   const navigate = useNavigate();
 
@@ -29,10 +31,11 @@ function Register() {
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    if (!email.trim()) {
+    if (!normalizedEmail) {
       newErrors.email = "Email is required";
-    } else if (!emailRegex.test(email)) {
+    } else if (!emailRegex.test(normalizedEmail)) {
       newErrors.email = "Please enter a valid email";
     }
 
@@ -66,14 +69,27 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    if (isSubmittingRef.current) {
+      return;
+    }
+
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+    setErrors({});
     setSuccess("");
 
     if (!validateForm()) {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      const data = await registerUser(name, email, password);
+      const data = await registerUser(
+        name,
+        email.trim().toLowerCase(),
+        password,
+      );
 
       setSuccess(data.message);
 
@@ -88,8 +104,16 @@ function Register() {
       }, 1500);
     } catch (error) {
       setErrors({
-        server: error.response?.data?.message || "Registration failed",
+        server:
+          error.code === "ECONNABORTED" || error.code === "ETIMEDOUT"
+            ? "Registration request timed out. Please try again."
+            : error.response?.data?.message ||
+              error.message ||
+              "Registration failed",
       });
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
   };
 
@@ -112,7 +136,7 @@ function Register() {
 
         {success && <p className="register-success">{success}</p>}
 
-        <form onSubmit={handleRegister}>
+        <form onSubmit={handleRegister} aria-busy={isSubmitting}>
           {/* Name */}
           <input
             type="text"
@@ -173,7 +197,9 @@ function Register() {
             <p className="field-error">{errors.confirmPassword}</p>
           )}
 
-          <button type="submit">Register</button>
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Registering..." : "Register"}
+          </button>
         </form>
 
         <div className="register-login">

@@ -55,14 +55,18 @@ export const uploadProfilePhoto = async (formData) => {
   return response.data;
 };
 
-export const getFollowers = async (userId) => {
-  const response = await axios.get(`${API_URL}/${userId}/followers`);
+export const getFollowers = async (userId, page = 1, limit = 5) => {
+  const response = await axios.get(
+    `${API_URL}/${userId}/followers?page=${page}&limit=${limit}`,
+  );
 
   return response.data;
 };
 
-export const getFollowing = async (userId) => {
-  const response = await axios.get(`${API_URL}/${userId}/following`);
+export const getFollowing = async (userId, page = 1, limit = 5) => {
+  const response = await axios.get(
+    `${API_URL}/${userId}/following?page=${page}&limit=${limit}`,
+  );
 
   return response.data;
 };

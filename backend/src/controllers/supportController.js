@@ -58,10 +58,18 @@ const getMySupportMessages = async (req, res) => {
 // Moderator gets all support messages
 const getAllSupportMessages = async (req, res) => {
   try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 5, 50);
+    const skip = (page - 1) * limit;
+
+    const totalMessages = await prisma.supportMessage.count();
+
     const messages = await prisma.supportMessage.findMany({
       orderBy: {
         createdAt: "desc",
       },
+      skip,
+      take: limit,
       include: {
         user: {
           select: {
@@ -75,6 +83,14 @@ const getAllSupportMessages = async (req, res) => {
 
     res.status(200).json({
       messages,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalMessages / limit),
+        totalMessages,
+        limit,
+        hasNextPage: page < Math.ceil(totalMessages / limit),
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error(error);

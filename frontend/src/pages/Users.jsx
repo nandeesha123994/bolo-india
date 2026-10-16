@@ -7,23 +7,26 @@ function Users() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const loadUsers = async () => {
+  // Load users
+  const loadUsers = async (search = "") => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.get("http://localhost:5000/api/users/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `http://localhost:5000/api/users/all?search=${encodeURIComponent(search)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
-      const allUsers = response.data.users || response.data;
+      // Supports both a direct array and a { users: [] } response
+      const allUsers = Array.isArray(response.data)
+        ? response.data
+        : response.data.users || [];
 
-      const currentUser = JSON.parse(localStorage.getItem("user"));
-
-      const otherUsers = allUsers.filter((user) => user.id !== currentUser.id);
-
-      setUsers(otherUsers);
+      setUsers(allUsers);
     } catch (error) {
       console.error("Failed to load users:", error);
     }
@@ -33,8 +36,7 @@ function Users() {
     loadUsers();
   }, []);
 
-  // ==================== FOLLOW ====================
-
+  // Follow
   const handleFollow = async (userId) => {
     try {
       await followUser(userId);
@@ -50,8 +52,7 @@ function Users() {
     }
   };
 
-  // ==================== UNFOLLOW ====================
-
+  // Unfollow
   const handleUnfollow = async (userId) => {
     try {
       await unfollowUser(userId);
@@ -67,41 +68,31 @@ function Users() {
     }
   };
 
-  // ==================== SEARCH ====================
-
-  const filteredUsers = users.filter((user) => {
-    const search = searchTerm.toLowerCase();
-
-    return (
-      user.name?.toLowerCase().includes(search) ||
-      user.email?.toLowerCase().includes(search)
-    );
-  });
+  // Search
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    loadUsers(value);
+  };
 
   return (
     <div className="users-container">
       <div className="users-card">
         <h1>People on Bolo India 🇮🇳</h1>
 
-        {/* ==================== SEARCH ==================== */}
-
         <div className="users-search">
           <input
             type="text"
-            placeholder="🔍 Search people by name or email..."
+            placeholder="🔍 Search people..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearch}
           />
         </div>
 
-        {/* ==================== USERS ==================== */}
-
-        {filteredUsers.length === 0 ? (
-          <p className="no-users">No users found.</p>
-        ) : (
-          filteredUsers.map((user) => (
+        {users.length > 0 ? (
+          users.map((user) => (
             <div className="user-item" key={user.id}>
-              <div className="user-info">
+              <div>
                 <h3>{user.name}</h3>
                 <p>{user.email}</p>
               </div>
@@ -125,6 +116,8 @@ function Users() {
               </div>
             </div>
           ))
+        ) : (
+          <p className="no-users">No users found.</p>
         )}
       </div>
     </div>

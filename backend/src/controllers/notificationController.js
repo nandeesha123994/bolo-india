@@ -6,6 +6,27 @@ const getNotifications = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 5, 50);
+
+    const skip = (page - 1) * limit;
+
+    // Total notifications
+    const totalNotifications = await prisma.notification.count({
+      where: {
+        userId,
+      },
+    });
+
+    // Total unread notifications
+    const unreadNotifications = await prisma.notification.count({
+      where: {
+        userId,
+        isRead: false,
+      },
+    });
+
+    // Get notifications for current page
     const notifications = await prisma.notification.findMany({
       where: {
         userId,
@@ -13,6 +34,8 @@ const getNotifications = async (req, res) => {
       orderBy: {
         createdAt: "desc",
       },
+      skip,
+      take: limit,
       include: {
         post: {
           select: {
@@ -23,8 +46,20 @@ const getNotifications = async (req, res) => {
       },
     });
 
+    const totalPages = Math.ceil(totalNotifications / limit);
+
     res.status(200).json({
       notifications,
+
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalNotifications,
+        unreadNotifications,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error("Get notifications error:", error);

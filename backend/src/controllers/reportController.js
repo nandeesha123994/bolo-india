@@ -1,6 +1,9 @@
 const prisma = require("../config/prisma");
 
+// =========================================================
 // USER reports a post
+// =========================================================
+
 const createReport = async (req, res) => {
   try {
     const { postId, reason } = req.body;
@@ -65,9 +68,22 @@ const createReport = async (req, res) => {
   }
 };
 
-// CONTENT MANAGER views reports
+// =========================================================
+// CONTENT MANAGER views reports - PAGINATION
+// =========================================================
+
 const getReports = async (req, res) => {
   try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+
+    const limit = Math.min(parseInt(req.query.limit) || 5, 50);
+
+    const skip = (page - 1) * limit;
+
+    // Total reports
+    const totalReports = await prisma.report.count();
+
+    // Get reports for current page
     const reports = await prisma.report.findMany({
       include: {
         reporter: {
@@ -91,10 +107,23 @@ const getReports = async (req, res) => {
       orderBy: {
         createdAt: "desc",
       },
+      skip,
+      take: limit,
     });
+
+    const totalPages = Math.ceil(totalReports / limit);
 
     res.status(200).json({
       reports,
+
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalReports,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -105,10 +134,26 @@ const getReports = async (req, res) => {
   }
 };
 
-// USER views their own reports
+// =========================================================
+// USER views their own reports - PAGINATION
+// =========================================================
 
 const getMyReports = async (req, res) => {
   try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+
+    const limit = Math.min(parseInt(req.query.limit) || 5, 50);
+
+    const skip = (page - 1) * limit;
+
+    // Total reports created by current user
+    const totalReports = await prisma.report.count({
+      where: {
+        reporterId: req.user.id,
+      },
+    });
+
+    // Get current user's reports
     const reports = await prisma.report.findMany({
       where: {
         reporterId: req.user.id,
@@ -130,10 +175,23 @@ const getMyReports = async (req, res) => {
       orderBy: {
         createdAt: "desc",
       },
+      skip,
+      take: limit,
     });
+
+    const totalPages = Math.ceil(totalReports / limit);
 
     res.status(200).json({
       reports,
+
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalReports,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -144,7 +202,9 @@ const getMyReports = async (req, res) => {
   }
 };
 
+// =========================================================
 // CONTENT MANAGER resolves/rejects report
+// =========================================================
 
 const updateReportStatus = async (req, res) => {
   try {
@@ -198,6 +258,10 @@ const updateReportStatus = async (req, res) => {
     });
   }
 };
+
+// =========================================================
+// EXPORTS
+// =========================================================
 
 module.exports = {
   createReport,

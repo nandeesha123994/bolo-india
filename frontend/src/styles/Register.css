@@ -116,6 +116,11 @@
   background: #1d4ed8;
 }
 
+.register-card form > button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 /* Login link */
 
 .register-login {

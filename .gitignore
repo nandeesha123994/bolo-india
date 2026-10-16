@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Frontend build
+frontend/dist/
+
+# Uploaded files
+backend/uploads/
+
+# Local tool configuration
+.kilo/
+**/.kilo/
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+/backend/.env
