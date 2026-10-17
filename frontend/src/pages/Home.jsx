@@ -8,6 +8,7 @@ import {
   createReport,
   deletePost,
 } from "../services/postService";
+import { API_ORIGIN } from "../api";
 import "../styles/Home.css";
 
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
@@ -566,7 +567,7 @@ function Home() {
                 const authorAvatarUrl = authorPhoto
                   ? authorPhoto.startsWith("http")
                     ? authorPhoto
-                    : `http://localhost:5000${authorPhoto}`
+                    : `${API_ORIGIN}${authorPhoto}`
                   : "";
 
                 return (
@@ -617,7 +618,7 @@ function Home() {
                     {/* Post Image */}
                     {post.image && (
                       <img
-                        src={`http://localhost:5000${post.image}`}
+                        src={`${API_ORIGIN}${post.image}`}
                         alt="Post"
                         className="post-image"
                       />
@@ -629,7 +630,7 @@ function Home() {
                         src={
                           post.video.startsWith("http")
                             ? post.video
-                            : `http://localhost:5000${post.video}`
+                            : `${API_ORIGIN}${post.video}`
                         }
                         controls
                         className="post-video"

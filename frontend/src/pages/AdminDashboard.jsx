@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL, { API_ORIGIN } from "../api";
 import "../styles/AdminDashboard.css";
-
-const API_BASE_URL = "http://localhost:5000/api";
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -57,7 +56,7 @@ function AdminDashboard() {
   const loadUsers = async (page = 1) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/users/admin/users?page=${page}&limit=5`,
+        `${API_URL}/users/admin/users?page=${page}&limit=5`,
         authConfig,
       );
 
@@ -94,7 +93,7 @@ function AdminDashboard() {
   const loadPosts = async (page = 1) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/posts?page=${page}&limit=5`,
+        `${API_URL}/posts?page=${page}&limit=5`,
       );
 
       const postList = response.data.posts || [];
@@ -124,7 +123,7 @@ function AdminDashboard() {
   const loadComments = async (page = 1) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/posts/admin/comments?page=${page}&limit=5`,
+        `${API_URL}/posts/admin/comments?page=${page}&limit=5`,
         authConfig,
       );
 
@@ -167,7 +166,7 @@ function AdminDashboard() {
   const updateUserStatus = async (userId, isActive) => {
     try {
       await axios.put(
-        `${API_BASE_URL}/users/admin/status/${userId}`,
+        `${API_URL}/users/admin/status/${userId}`,
         { isActive: !isActive },
         authConfig,
       );
@@ -196,7 +195,7 @@ function AdminDashboard() {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/posts/admin/${postId}`, authConfig);
+      await axios.delete(`${API_URL}/posts/admin/${postId}`, authConfig);
 
       alert("Post deleted successfully");
 
@@ -219,7 +218,7 @@ function AdminDashboard() {
 
     try {
       await axios.delete(
-        `${API_BASE_URL}/posts/comment/${commentId}`,
+        `${API_URL}/posts/comment/${commentId}`,
         authConfig,
       );
 
@@ -388,7 +387,7 @@ function AdminDashboard() {
 
                     {post.image && (
                       <img
-                        src={`http://localhost:5000${post.image}`}
+                        src={`${API_ORIGIN}${post.image}`}
                         alt="Post"
                         className="admin-post-image"
                       />

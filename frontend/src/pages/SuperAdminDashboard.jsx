@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ContactMessages from "../components/ContactMessages";
+import API_BASE_URL from "../api";
 import "../styles/SuperAdminDashboard.css";
 
-const API_URL = "http://localhost:5000/api/users";
+const API_URL = `${API_BASE_URL}/users`;
 const USERS_PER_PAGE = 10;
 
 function SuperAdminDashboard() {

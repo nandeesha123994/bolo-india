@@ -1,6 +1,7 @@
 import axios from "axios";
+import API_BASE_URL from "../api";
 
-const POSTS_API = "http://localhost:5000/api/posts";
+const POSTS_API = `${API_BASE_URL}/posts`;
 
 export const getModeratorPosts = async () => {
   const response = await axios.get(POSTS_API);
@@ -45,7 +46,7 @@ export const getSupportMessages = async (page = 1, limit = 5) => {
   const token = localStorage.getItem("token");
 
   const response = await axios.get(
-    `http://localhost:5000/api/support?page=${page}&limit=${limit}`,
+    `${API_BASE_URL}/support?page=${page}&limit=${limit}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -60,7 +61,7 @@ export const replyToSupportMessage = async (messageId, reply) => {
   const token = localStorage.getItem("token");
 
   const response = await axios.put(
-    `http://localhost:5000/api/support/${messageId}/reply`,
+    `${API_BASE_URL}/support/${messageId}/reply`,
     {
       reply,
     },

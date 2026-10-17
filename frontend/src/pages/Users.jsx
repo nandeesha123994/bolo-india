@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../api";
 import { followUser, unfollowUser } from "../services/userService";
 import "../styles/Users.css";
 
@@ -13,7 +14,7 @@ function Users() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        `http://localhost:5000/api/users/all?search=${encodeURIComponent(search)}`,
+        `${API_URL}/users/all?search=${encodeURIComponent(search)}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

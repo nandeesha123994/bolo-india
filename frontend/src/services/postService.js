@@ -1,6 +1,7 @@
 import axios from "axios";
+import API_BASE_URL from "../api";
 
-const API_URL = "http://localhost:5000/api/posts";
+const API_URL = `${API_BASE_URL}/posts`;
 
 export const createPost = async (postData) => {
   const token = localStorage.getItem("token");
@@ -62,7 +63,7 @@ export const createReport = async (postId, reason) => {
   const token = localStorage.getItem("token");
 
   const response = await axios.post(
-    "http://localhost:5000/api/reports",
+    `${API_BASE_URL}/reports`,
     {
       postId,
       reason,
@@ -81,7 +82,7 @@ export const getMyReports = async (page = 1, limit = 5) => {
   const token = localStorage.getItem("token");
 
   const response = await axios.get(
-    `http://localhost:5000/api/reports/my-reports?page=${page}&limit=${limit}`,
+    `${API_BASE_URL}/reports/my-reports?page=${page}&limit=${limit}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -96,7 +97,7 @@ export const getReports = async (page = 1, limit = 5) => {
   const token = localStorage.getItem("token");
 
   const response = await axios.get(
-    `http://localhost:5000/api/reports?page=${page}&limit=${limit}`,
+    `${API_BASE_URL}/reports?page=${page}&limit=${limit}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

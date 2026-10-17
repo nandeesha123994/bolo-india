@@ -1,6 +1,7 @@
 import axios from "axios";
+import API_BASE_URL from "../api";
 
-const SUPPORT_API = "http://localhost:5000/api/support";
+const SUPPORT_API = `${API_BASE_URL}/support`;
 
 // Send support message
 export const sendSupportMessage = async (message) => {

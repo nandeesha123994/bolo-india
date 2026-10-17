@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../api";
 import { getReports } from "../services/postService";
 import "../styles/ContentManagerDashboard.css";
 
@@ -35,7 +36,7 @@ function ContentManagerDashboard() {
 
   const loadPosts = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/posts");
+      const response = await axios.get(`${API_URL}/posts`);
 
       setPosts(response.data.posts || []);
     } catch (error) {
@@ -118,7 +119,7 @@ function ContentManagerDashboard() {
     }
 
     try {
-      await axios.delete(`http://localhost:5000/api/posts/admin/${postId}`, {
+      await axios.delete(`${API_URL}/posts/admin/${postId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -147,7 +148,7 @@ function ContentManagerDashboard() {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/reports/${reportId}/status`,
+        `${API_URL}/reports/${reportId}/status`,
         {
           status,
           response: response.trim(),

@@ -8,9 +8,8 @@ import {
   updateProfile,
 } from "../services/userService";
 import { getPosts } from "../services/postService";
+import { API_ORIGIN } from "../api";
 import "../styles/Profile.css";
-
-const API_BASE_URL = "http://localhost:5000";
 
 function getUserId(post) {
   return (
@@ -29,7 +28,7 @@ function getMediaUrl(path) {
     return path;
   }
 
-  return `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+  return `${API_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
 function Profile() {

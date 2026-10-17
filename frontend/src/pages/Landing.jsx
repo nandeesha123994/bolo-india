@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../api";
 import "./Landing.css";
 
 import bolologo from "../assets/Bolo_India_Logo.svg";
@@ -47,7 +48,7 @@ function Landing() {
     setContactStatus("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/contact", {
+      const response = await fetch(`${API_URL}/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
