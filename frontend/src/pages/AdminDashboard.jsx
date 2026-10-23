@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL, { API_ORIGIN } from "../api";
+import { useFeedback } from "../components/FeedbackProvider";
 import "../styles/AdminDashboard.css";
 
 function AdminDashboard() {
+  const { showToast, confirmAction } = useFeedback();
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
@@ -171,7 +173,7 @@ function AdminDashboard() {
         authConfig,
       );
 
-      alert(
+      showToast(
         !isActive
           ? "User activated successfully"
           : "User deactivated successfully",
@@ -181,14 +183,17 @@ function AdminDashboard() {
     } catch (error) {
       console.error("Update user status error:", error);
 
-      alert(error.response?.data?.message || "Failed to update user status");
+      showToast(
+        error.response?.data?.message || "Failed to update user status.",
+        "error",
+      );
     }
   };
 
   // ==================== DELETE POST ====================
 
   const deletePost = async (postId) => {
-    const confirmDelete = window.confirm(
+    const confirmDelete = await confirmAction(
       "Are you sure you want to delete this post?",
     );
 
@@ -197,20 +202,23 @@ function AdminDashboard() {
     try {
       await axios.delete(`${API_URL}/posts/admin/${postId}`, authConfig);
 
-      alert("Post deleted successfully");
+      showToast("Post deleted successfully.");
 
       await loadPosts(postsPagination.currentPage);
     } catch (error) {
       console.error("Delete post error:", error);
 
-      alert(error.response?.data?.message || "Failed to delete post");
+      showToast(
+        error.response?.data?.message || "Failed to delete post.",
+        "error",
+      );
     }
   };
 
   // ==================== DELETE COMMENT ====================
 
   const deleteComment = async (commentId) => {
-    const confirmDelete = window.confirm(
+    const confirmDelete = await confirmAction(
       "Are you sure you want to delete this comment?",
     );
 
@@ -222,13 +230,16 @@ function AdminDashboard() {
         authConfig,
       );
 
-      alert("Comment deleted successfully");
+      showToast("Comment deleted successfully.");
 
       await loadComments(commentsPagination.currentPage);
     } catch (error) {
       console.error("Delete comment error:", error);
 
-      alert(error.response?.data?.message || "Failed to delete comment");
+      showToast(
+        error.response?.data?.message || "Failed to delete comment.",
+        "error",
+      );
     }
   };
 

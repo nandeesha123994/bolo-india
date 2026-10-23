@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ContactMessages from "../components/ContactMessages";
+import { useFeedback } from "../components/FeedbackProvider";
 import API_BASE_URL from "../api";
 import "../styles/SuperAdminDashboard.css";
 
@@ -8,6 +9,7 @@ const API_URL = `${API_BASE_URL}/users`;
 const USERS_PER_PAGE = 10;
 
 function SuperAdminDashboard() {
+  const { showToast } = useFeedback();
   const [users, setUsers] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState({});
   const [activeTab, setActiveTab] = useState("overview");
@@ -78,9 +80,10 @@ function SuperAdminDashboard() {
     } catch (error) {
       console.error("Failed to load users:", error);
 
-      alert(
+      showToast(
         error.response?.data?.message ||
           "Failed to load users. Please try again.",
+        "error",
       );
     } finally {
       setLoadingUsers(false);
@@ -128,7 +131,7 @@ function SuperAdminDashboard() {
     event.preventDefault();
 
     if (!newUser.name.trim() || !newUser.email.trim()) {
-      alert("Please enter the user's name and email.");
+      showToast("Please enter the user's name and email.", "error");
       return;
     }
 
@@ -145,7 +148,7 @@ function SuperAdminDashboard() {
         authConfig,
       );
 
-      alert(response.data.message || "User registered successfully.");
+      showToast(response.data.message || "User registered successfully.");
 
       setNewUser({
         name: "",
@@ -158,9 +161,10 @@ function SuperAdminDashboard() {
     } catch (error) {
       console.error("Create user error:", error);
 
-      alert(
+      showToast(
         error.response?.data?.message ||
           "Failed to register user. Please try again.",
+        "error",
       );
     } finally {
       setCreatingUser(false);
@@ -182,7 +186,7 @@ function SuperAdminDashboard() {
     const newRole = selectedRoles[userId];
 
     if (!newRole) {
-      alert("Please select a role.");
+      showToast("Please select a role.", "error");
       return;
     }
 
@@ -193,14 +197,17 @@ function SuperAdminDashboard() {
         authConfig,
       );
 
-      alert(`Role updated to ${newRole}`);
+      showToast(`Role updated to ${newRole}`);
 
       // Reload current search results after updating the role.
       await loadUsers(currentPage, searchTerm);
     } catch (error) {
       console.error("Failed to update role:", error);
 
-      alert(error.response?.data?.message || "Failed to update user role.");
+      showToast(
+        error.response?.data?.message || "Failed to update user role.",
+        "error",
+      );
     }
   };
 

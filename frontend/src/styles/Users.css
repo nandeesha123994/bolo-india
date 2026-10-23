@@ -19,32 +19,6 @@
   margin-bottom: 30px;
 }
 
-.follow-feedback {
-  position: fixed;
-  top: 84px;
-  left: 50%;
-  z-index: 1100;
-  width: min(800px, calc(100vw - 32px));
-  box-sizing: border-box;
-  margin: 0;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
-  transform: translateX(-50%);
-}
-
-.follow-feedback.success {
-  background: #ecfdf5;
-  color: #047857;
-}
-
-.follow-feedback.error {
-  background: #fef2f2;
-  color: #b91c1c;
-}
-
 .user-item {
   display: flex;
   justify-content: space-between;

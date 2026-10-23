@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL from "../api";
+import { useFeedback } from "../components/FeedbackProvider";
 import { followUser, unfollowUser } from "../services/userService";
 import "../styles/Users.css";
 
 function Users() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [feedback, setFeedback] = useState({ type: "", message: "" });
   const [pendingUserId, setPendingUserId] = useState(null);
+  const { showToast } = useFeedback();
 
   // Load users
   const loadUsers = async (search = "") => {
@@ -45,7 +46,6 @@ function Users() {
 
     try {
       setPendingUserId(userId);
-      setFeedback({ type: "", message: "" });
       await followUser(userId);
 
       setUsers((prevUsers) =>
@@ -53,16 +53,13 @@ function Users() {
           user.id === userId ? { ...user, isFollowing: true } : user,
         ),
       );
-      setFeedback({
-        type: "success",
-        message: `You are now following ${user?.name || "this user"}.`,
-      });
+      showToast(`You are now following ${user?.name || "this user"}.`);
     } catch (error) {
       console.error(error);
-      setFeedback({
-        type: "error",
-        message: error.response?.data?.message || "Failed to follow user.",
-      });
+      showToast(
+        error.response?.data?.message || "Failed to follow user.",
+        "error",
+      );
     } finally {
       setPendingUserId(null);
     }
@@ -74,7 +71,6 @@ function Users() {
 
     try {
       setPendingUserId(userId);
-      setFeedback({ type: "", message: "" });
       await unfollowUser(userId);
 
       setUsers((prevUsers) =>
@@ -82,16 +78,13 @@ function Users() {
           user.id === userId ? { ...user, isFollowing: false } : user,
         ),
       );
-      setFeedback({
-        type: "success",
-        message: `You unfollowed ${user?.name || "this user"}.`,
-      });
+      showToast(`You unfollowed ${user?.name || "this user"}.`);
     } catch (error) {
       console.error(error);
-      setFeedback({
-        type: "error",
-        message: error.response?.data?.message || "Failed to unfollow user.",
-      });
+      showToast(
+        error.response?.data?.message || "Failed to unfollow user.",
+        "error",
+      );
     } finally {
       setPendingUserId(null);
     }
@@ -117,16 +110,6 @@ function Users() {
             onChange={handleSearch}
           />
         </div>
-
-        {feedback.message && (
-          <p
-            className={`follow-feedback ${feedback.type}`}
-            role={feedback.type === "error" ? "alert" : "status"}
-            aria-live="polite"
-          >
-            {feedback.message}
-          </p>
-        )}
 
         {users.length > 0 ? (
           users.map((user) => (

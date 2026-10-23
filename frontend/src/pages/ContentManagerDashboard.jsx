@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL from "../api";
+import { useFeedback } from "../components/FeedbackProvider";
 import { getReports } from "../services/postService";
 import "../styles/ContentManagerDashboard.css";
 
 function ContentManagerDashboard() {
+  const { showToast, confirmAction } = useFeedback();
   const [posts, setPosts] = useState([]);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,7 +112,7 @@ function ContentManagerDashboard() {
   // ==================== DELETE POST ====================
 
   const deletePost = async (postId) => {
-    const confirmDelete = window.confirm(
+    const confirmDelete = await confirmAction(
       "Are you sure you want to remove this content?",
     );
 
@@ -125,14 +127,17 @@ function ContentManagerDashboard() {
         },
       });
 
-      alert("Content removed successfully");
+      showToast("Content removed successfully.");
 
       loadPosts();
       loadReports(1);
     } catch (error) {
       console.error(error);
 
-      alert(error.response?.data?.message || "Failed to remove content");
+      showToast(
+        error.response?.data?.message || "Failed to remove content.",
+        "error",
+      );
     }
   };
 
@@ -142,7 +147,7 @@ function ContentManagerDashboard() {
     const response = reportResponses[reportId];
 
     if (!response || !response.trim()) {
-      alert("Please write a response before updating the report.");
+      showToast("Please write a response before updating the report.", "error");
       return;
     }
 
@@ -160,7 +165,7 @@ function ContentManagerDashboard() {
         },
       );
 
-      alert(
+      showToast(
         status === "RESOLVED"
           ? "Report resolved successfully"
           : "Report rejected successfully",
@@ -175,7 +180,10 @@ function ContentManagerDashboard() {
     } catch (error) {
       console.error(error);
 
-      alert(error.response?.data?.message || "Failed to update report");
+      showToast(
+        error.response?.data?.message || "Failed to update report.",
+        "error",
+      );
     }
   };
 

@@ -10,7 +10,7 @@ try {
         exit 1
     }
 
-    $env:NEON_DATABASE_URL = $connection
+    $env:DATABASE_URL = $connection
 
     Write-Host "Connection string loaded into this PowerShell session."
 }

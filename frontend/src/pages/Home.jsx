@@ -9,6 +9,7 @@ import {
   deletePost,
 } from "../services/postService";
 import { API_ORIGIN } from "../api";
+import { useFeedback } from "../components/FeedbackProvider";
 import "../styles/Home.css";
 
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
@@ -81,6 +82,7 @@ const formatRelativeTime = (dateString) => {
 
 function Home() {
   const loggedInUser = JSON.parse(localStorage.getItem("user") || "null");
+  const { showToast, confirmAction } = useFeedback();
 
   const [showForm, setShowForm] = useState(false);
   const [content, setContent] = useState("");
@@ -175,7 +177,7 @@ function Home() {
     if (!selectedImage) return;
 
     if (!selectedImage.type.startsWith("image/")) {
-      alert("Please choose a valid image");
+      showToast("Please choose a valid image.", "error");
       e.target.value = "";
       return;
     }
@@ -197,14 +199,14 @@ function Home() {
     if (!selectedVideo) return;
 
     if (!SUPPORTED_VIDEO_TYPES.includes(selectedVideo.type)) {
-      alert("Please choose an MP4, WebM, or MOV video");
+      showToast("Please choose an MP4, WebM, or MOV video.", "error");
       e.target.value = "";
       setVideo(null);
       return;
     }
 
     if (selectedVideo.size > MAX_VIDEO_SIZE) {
-      alert("Video must be 50 MB or smaller");
+      showToast("Video must be 50 MB or smaller.", "error");
       e.target.value = "";
       setVideo(null);
       return;
@@ -241,12 +243,12 @@ function Home() {
   // Create post
   const handleCreatePost = async () => {
     if (!content.trim()) {
-      alert("Please write something");
+      showToast("Please write something.", "error");
       return;
     }
 
     if (image && video) {
-      alert("Please add either an image or a video, not both");
+      showToast("Please add either an image or a video, not both.", "error");
       return;
     }
 
@@ -271,7 +273,7 @@ function Home() {
 
       await createPost(formData);
 
-      alert("Post created successfully!");
+      showToast("Post created successfully.");
 
       // Reset form and selected files
       setContent("");
@@ -291,23 +293,33 @@ function Home() {
       loadPosts();
     } catch (error) {
       console.error("Failed to create post:", error);
-      alert(error.response?.data?.message || "Failed to create post");
+      showToast(
+        error.response?.data?.message || "Failed to create post.",
+        "error",
+      );
     }
   };
 
   // Like post
   const handleLike = async (postId) => {
+    const post = posts.find((item) => item.id === postId);
+    const wasLiked = post?.likes?.some(
+      (like) => Number(like.userId) === Number(loggedInUser?.id),
+    );
+
     try {
       await likePost(postId);
+      showToast(wasLiked ? "Like removed." : "Post liked.");
       loadPosts();
     } catch (error) {
       console.error("Failed to toggle post like:", error);
+      showToast(error.response?.data?.message || "Failed to update like.", "error");
     }
   };
 
   // Delete own post
   const handleDeletePost = async (postId) => {
-    const confirmDelete = window.confirm(
+    const confirmDelete = await confirmAction(
       "Are you sure you want to delete this post?",
     );
 
@@ -315,11 +327,14 @@ function Home() {
 
     try {
       await deletePost(postId);
-      alert("Post deleted successfully!");
+      showToast("Post deleted successfully.");
       loadPosts();
     } catch (error) {
       console.error("Failed to delete post:", error);
-      alert(error.response?.data?.message || "Failed to delete post");
+      showToast(
+        error.response?.data?.message || "Failed to delete post.",
+        "error",
+      );
     }
   };
 
@@ -328,7 +343,7 @@ function Home() {
     const text = commentText[postId];
 
     if (!text || !text.trim()) {
-      alert("Please write a comment");
+      showToast("Please write a comment.", "error");
       return;
     }
 
@@ -343,7 +358,10 @@ function Home() {
       loadPosts();
     } catch (error) {
       console.error("Failed to add comment:", error);
-      alert(error.response?.data?.message || "Failed to add comment");
+      showToast(
+        error.response?.data?.message || "Failed to add comment.",
+        "error",
+      );
     }
   };
 
@@ -352,14 +370,14 @@ function Home() {
     const reason = reportReason[postId];
 
     if (!reason || !reason.trim()) {
-      alert("Please enter a reason for reporting");
+      showToast("Please enter a reason for reporting.", "error");
       return;
     }
 
     try {
       await createReport(postId, reason);
 
-      alert("Report submitted successfully!");
+      showToast("Report submitted successfully.");
 
       setReportReason((prev) => ({
         ...prev,
@@ -372,7 +390,10 @@ function Home() {
       }));
     } catch (error) {
       console.error("Failed to report post:", error);
-      alert(error.response?.data?.message || "Failed to submit report");
+      showToast(
+        error.response?.data?.message || "Failed to submit report.",
+        "error",
+      );
     }
   };
 

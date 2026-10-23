@@ -15,10 +15,12 @@ import Support from "./pages/Support";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
+import { FeedbackProvider } from "./components/FeedbackProvider";
 
 function App() {
   return (
     <BrowserRouter>
+      <FeedbackProvider>
       <Routes>
         {/* ==================== PUBLIC PAGES ==================== */}
 
@@ -106,6 +108,7 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </FeedbackProvider>
     </BrowserRouter>
   );
 }

@@ -6,9 +6,11 @@ import {
   getMySupportMessages,
 } from "../services/supportService";
 
+import { useFeedback } from "../components/FeedbackProvider";
 import "../styles/Support.css";
 
 function Support() {
+  const { showToast } = useFeedback();
   const [message, setMessage] = useState("");
   const [supportMessages, setSupportMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ function Support() {
     e.preventDefault();
 
     if (!message.trim()) {
-      alert("Please enter your message");
+      showToast("Please enter your message.", "error");
       return;
     }
 
@@ -47,11 +49,14 @@ function Support() {
 
       setMessage("");
 
-      alert("Message sent to Moderator successfully");
+      showToast("Message sent to Moderator successfully.");
     } catch (error) {
       console.error("Failed to send support message:", error);
 
-      alert(error.response?.data?.message || "Failed to send support message");
+      showToast(
+        error.response?.data?.message || "Failed to send support message.",
+        "error",
+      );
     } finally {
       setSending(false);
     }

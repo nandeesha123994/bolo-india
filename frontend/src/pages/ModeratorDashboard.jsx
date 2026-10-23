@@ -8,9 +8,11 @@ import {
   replyToSupportMessage,
 } from "../services/moderatorService";
 
+import { useFeedback } from "../components/FeedbackProvider";
 import "../styles/ModeratorDashboard.css";
 
 function ModeratorDashboard() {
+  const { showToast, confirmAction } = useFeedback();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -92,7 +94,7 @@ function ModeratorDashboard() {
   };
 
   const handleDeleteComment = async (commentId) => {
-    const confirmDelete = window.confirm(
+    const confirmDelete = await confirmAction(
       "Are you sure you want to delete this comment?",
     );
 
@@ -107,11 +109,14 @@ function ModeratorDashboard() {
         previousComments.filter((comment) => comment.id !== commentId),
       );
 
-      alert("Comment deleted successfully");
+      showToast("Comment deleted successfully.");
     } catch (error) {
       console.error("Failed to delete comment:", error);
 
-      alert(error.response?.data?.message || "Failed to delete comment");
+      showToast(
+        error.response?.data?.message || "Failed to delete comment.",
+        "error",
+      );
     }
   };
 
@@ -119,7 +124,7 @@ function ModeratorDashboard() {
     const reply = replyText[messageId];
 
     if (!reply || !reply.trim()) {
-      alert("Please enter a reply");
+      showToast("Please enter a reply.", "error");
       return;
     }
 
@@ -137,11 +142,14 @@ function ModeratorDashboard() {
         [messageId]: "",
       }));
 
-      alert("Reply sent successfully");
+      showToast("Reply sent successfully.");
     } catch (error) {
       console.error("Failed to send reply:", error);
 
-      alert(error.response?.data?.message || "Failed to send reply");
+      showToast(
+        error.response?.data?.message || "Failed to send reply.",
+        "error",
+      );
     }
   };
 
