@@ -26,6 +26,30 @@ const getInitials = (name = "") => {
     .slice(0, 2);
 };
 
+const ProfileAvatar = ({ name, image, className }) => {
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `${API_ORIGIN}${image}`
+    : "";
+
+  return (
+    <div className={`${className} profile-avatar`}>
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt=""
+          onError={(event) => {
+            event.currentTarget.hidden = true;
+            event.currentTarget.nextElementSibling.hidden = false;
+          }}
+        />
+      )}
+      <span hidden={Boolean(imageUrl)}>{getInitials(name)}</span>
+    </div>
+  );
+};
+
 const formatRelativeTime = (dateString) => {
   if (!dateString) return "Just now";
 
@@ -277,7 +301,7 @@ function Home() {
       await likePost(postId);
       loadPosts();
     } catch (error) {
-      console.error("Failed to like post:", error);
+      console.error("Failed to toggle post like:", error);
     }
   };
 
@@ -637,8 +661,20 @@ function Home() {
                       />
                     )}
 
-                    <button onClick={() => handleLike(post.id)}>
-                      ❤️ {post.likes?.length || 0}
+                    <button
+                      onClick={() => handleLike(post.id)}
+                      aria-pressed={post.likes?.some(
+                        (like) =>
+                          Number(like.userId) === Number(loggedInUser?.id),
+                      )}
+                    >
+                      {post.likes?.some(
+                        (like) =>
+                          Number(like.userId) === Number(loggedInUser?.id),
+                      )
+                        ? "❤️"
+                        : "🤍"}{" "}
+                      {post.likes?.length || 0}
                     </button>
 
                     {loggedInUser?.id === post.authorId && (
@@ -686,29 +722,61 @@ function Home() {
                       <h3>Comments 💬</h3>
 
                       {comments[post.id]?.length > 0 &&
-                        comments[post.id].map((comment) => (
-                          <div className="comment" key={comment.id}>
-                            {comment.content}
-                          </div>
-                        ))}
+                        comments[post.id].map((comment) => {
+                          const commenter = comment.user || {};
+                          const commenterName = commenter.name || "Unknown User";
+
+                          return (
+                            <div className="comment" key={comment.id}>
+                              <ProfileAvatar
+                                name={commenterName}
+                                image={commenter.profileImage}
+                                className="comment-avatar"
+                              />
+                              <div className="comment-body">
+                                <div className="comment-meta">
+                                  <span className="comment-author">
+                                    {commenterName}
+                                  </span>
+                                  <span className="comment-time">
+                                    {formatRelativeTime(comment.createdAt)}
+                                  </span>
+                                </div>
+                                <p className="comment-content">
+                                  {comment.content}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
 
                       {post.commentsEnabled ? (
-                        <div className="comment-form">
-                          <input
-                            type="text"
-                            placeholder="Write a comment..."
-                            value={commentText[post.id] || ""}
-                            onChange={(e) =>
-                              setCommentText((prev) => ({
-                                ...prev,
-                                [post.id]: e.target.value,
-                              }))
+                        <div className="comment-compose">
+                          <ProfileAvatar
+                            name={loggedInUser?.name || "You"}
+                            image={
+                              loggedInUser?.profileImage ||
+                              loggedInUser?.profilePhoto
                             }
+                            className="comment-avatar"
                           />
+                          <div className="comment-form">
+                            <input
+                              type="text"
+                              placeholder="Write a comment..."
+                              value={commentText[post.id] || ""}
+                              onChange={(e) =>
+                                setCommentText((prev) => ({
+                                  ...prev,
+                                  [post.id]: e.target.value,
+                                }))
+                              }
+                            />
 
-                          <button onClick={() => handleComment(post.id)}>
-                            Comment
-                          </button>
+                            <button onClick={() => handleComment(post.id)}>
+                              Comment
+                            </button>
+                          </div>
                         </div>
                       ) : (
                         <p className="comments-disabled">

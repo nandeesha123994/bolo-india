@@ -7,6 +7,8 @@ import "../styles/Users.css";
 function Users() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
+  const [pendingUserId, setPendingUserId] = useState(null);
 
   // Load users
   const loadUsers = async (search = "") => {
@@ -39,7 +41,11 @@ function Users() {
 
   // Follow
   const handleFollow = async (userId) => {
+    const user = users.find((item) => item.id === userId);
+
     try {
+      setPendingUserId(userId);
+      setFeedback({ type: "", message: "" });
       await followUser(userId);
 
       setUsers((prevUsers) =>
@@ -47,15 +53,28 @@ function Users() {
           user.id === userId ? { ...user, isFollowing: true } : user,
         ),
       );
+      setFeedback({
+        type: "success",
+        message: `You are now following ${user?.name || "this user"}.`,
+      });
     } catch (error) {
       console.error(error);
-      alert("Failed to follow user");
+      setFeedback({
+        type: "error",
+        message: error.response?.data?.message || "Failed to follow user.",
+      });
+    } finally {
+      setPendingUserId(null);
     }
   };
 
   // Unfollow
   const handleUnfollow = async (userId) => {
+    const user = users.find((item) => item.id === userId);
+
     try {
+      setPendingUserId(userId);
+      setFeedback({ type: "", message: "" });
       await unfollowUser(userId);
 
       setUsers((prevUsers) =>
@@ -63,9 +82,18 @@ function Users() {
           user.id === userId ? { ...user, isFollowing: false } : user,
         ),
       );
+      setFeedback({
+        type: "success",
+        message: `You unfollowed ${user?.name || "this user"}.`,
+      });
     } catch (error) {
       console.error(error);
-      alert("Failed to unfollow user");
+      setFeedback({
+        type: "error",
+        message: error.response?.data?.message || "Failed to unfollow user.",
+      });
+    } finally {
+      setPendingUserId(null);
     }
   };
 
@@ -90,6 +118,16 @@ function Users() {
           />
         </div>
 
+        {feedback.message && (
+          <p
+            className={`follow-feedback ${feedback.type}`}
+            role={feedback.type === "error" ? "alert" : "status"}
+            aria-live="polite"
+          >
+            {feedback.message}
+          </p>
+        )}
+
         {users.length > 0 ? (
           users.map((user) => (
             <div className="user-item" key={user.id}>
@@ -103,15 +141,17 @@ function Users() {
                   <button
                     className="unfollow-btn"
                     onClick={() => handleUnfollow(user.id)}
+                    disabled={pendingUserId === user.id}
                   >
-                    Unfollow
+                    {pendingUserId === user.id ? "Please wait..." : "Unfollow"}
                   </button>
                 ) : (
                   <button
                     className="follow-btn"
                     onClick={() => handleFollow(user.id)}
+                    disabled={pendingUserId === user.id}
                   >
-                    Follow
+                    {pendingUserId === user.id ? "Please wait..." : "Follow"}
                   </button>
                 )}
               </div>

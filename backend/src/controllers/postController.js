@@ -311,8 +311,18 @@ const likePost = async (req, res) => {
     });
 
     if (existingLike) {
-      return res.status(400).json({
-        message: "Post already liked",
+      await prisma.like.delete({
+        where: {
+          userId_postId: {
+            userId,
+            postId,
+          },
+        },
+      });
+
+      return res.status(200).json({
+        message: "Post unliked successfully",
+        liked: false,
       });
     }
 
@@ -344,6 +354,7 @@ const likePost = async (req, res) => {
 
     res.status(201).json({
       message: "Post liked successfully",
+      liked: true,
       like,
     });
   } catch (error) {
