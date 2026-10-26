@@ -8,6 +8,7 @@ const {
   registerUser,
   loginUser,
   getProfile,
+  getPublicProfile,
   updateProfilePhoto,
   createUserBySuperAdmin,
   followUser,
@@ -57,6 +58,8 @@ router.post(
 router.get("/profile", authMiddleware, getProfile);
 
 router.put("/profile", authMiddleware, updateProfile);
+
+router.get("/:id/profile", authMiddleware, getPublicProfile);
 
 router.put("/profile/photo", authMiddleware, (req, res, next) => {
   upload.single("profileImage")(req, res, (error) => {

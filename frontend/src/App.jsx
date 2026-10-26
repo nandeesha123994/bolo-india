@@ -7,6 +7,8 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
+import PublicProfile from "./pages/PublicProfile";
+import Chat from "./pages/Chat";
 import Users from "./pages/Users";
 import RoleDashboard from "./components/RoleDashboard";
 import MyReports from "./pages/MyReports";
@@ -52,6 +54,26 @@ function App() {
             <ProtectedRoute>
               <Navbar />
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile/:userId"
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <PublicProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <Chat />
             </ProtectedRoute>
           }
         />

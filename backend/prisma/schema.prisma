@@ -53,6 +53,10 @@ model User {
 
   notifications    Notification[]
   welcomeEmailOutbox WelcomeEmailOutbox?
+
+  chatConversationsAsFirst  ChatConversation[] @relation("ChatConversationFirstUser")
+  chatConversationsAsSecond ChatConversation[] @relation("ChatConversationSecondUser")
+  chatMessages              ChatMessage[]     @relation("ChatMessageSender")
 }
 
 model WelcomeEmailOutbox {
@@ -69,6 +73,39 @@ model WelcomeEmailOutbox {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sentAt, nextAttemptAt, lockedAt])
+}
+
+model ChatConversation {
+  id             Int      @id @default(autoincrement())
+  firstUserId    Int
+  secondUserId   Int
+  lastMessageAt  DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  firstUser  User         @relation("ChatConversationFirstUser", fields: [firstUserId], references: [id], onDelete: Cascade)
+  secondUser User         @relation("ChatConversationSecondUser", fields: [secondUserId], references: [id], onDelete: Cascade)
+  messages   ChatMessage[]
+
+  @@unique([firstUserId, secondUserId])
+  @@index([firstUserId, lastMessageAt])
+  @@index([secondUserId, lastMessageAt])
+}
+
+model ChatMessage {
+  id             Int      @id @default(autoincrement())
+  conversationId Int
+  senderId       Int
+  content        String?
+  image          String?
+  readAt         DateTime?
+  createdAt      DateTime @default(now())
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User             @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([conversationId, readAt])
 }
 
 model Post {

@@ -35,6 +35,43 @@
   color: #333;
 }
 
+.user-profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.users-avatar-link {
+  display: flex;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.users-avatar,
+.users-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.users-name-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.users-name-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
 .user-item p {
   margin: 0;
   color: #666;

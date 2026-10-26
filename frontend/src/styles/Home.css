@@ -189,6 +189,19 @@
   font-size: 16px;
   font-weight: 700;
   color: #111827;
+  text-decoration: none;
+}
+
+.post-author-name:hover,
+.comment-author:hover {
+  text-decoration: underline;
+}
+
+.post-avatar-link,
+.profile-avatar-link {
+  display: flex;
+  flex-shrink: 0;
+  text-decoration: none;
 }
 
 .post-time {
@@ -391,6 +404,7 @@
   color: #111827;
   font-size: 13px;
   font-weight: 700;
+  text-decoration: none;
 }
 
 .comment-time {

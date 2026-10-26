@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import API_URL from "../api";
+import { Link } from "react-router-dom";
+import API_URL, { API_ORIGIN } from "../api";
 import { useFeedback } from "../components/FeedbackProvider";
 import { followUser, unfollowUser } from "../services/userService";
 import "../styles/Users.css";
@@ -114,9 +115,36 @@ function Users() {
         {users.length > 0 ? (
           users.map((user) => (
             <div className="user-item" key={user.id}>
-              <div>
-                <h3>{user.name}</h3>
-                <p>{user.email}</p>
+              <div className="user-profile-summary">
+                <Link
+                  to={`/profile/${user.id}`}
+                  className="users-avatar-link"
+                  aria-label={`View ${user.name}'s profile`}
+                >
+                  {user.profileImage ? (
+                    <img
+                      src={
+                        user.profileImage.startsWith("http")
+                          ? user.profileImage
+                          : `${API_ORIGIN}${user.profileImage.startsWith("/") ? "" : "/"}${user.profileImage}`
+                      }
+                      alt=""
+                      className="users-avatar"
+                    />
+                  ) : (
+                    <span className="users-avatar-placeholder">
+                      {user.name?.charAt(0)?.toUpperCase() || "U"}
+                    </span>
+                  )}
+                </Link>
+                <div>
+                  <h3>
+                    <Link to={`/profile/${user.id}`} className="users-name-link">
+                      {user.name}
+                    </Link>
+                  </h3>
+                  <p>{user.email}</p>
+                </div>
               </div>
 
               <div className="user-actions">

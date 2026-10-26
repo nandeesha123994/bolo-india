@@ -22,6 +22,7 @@ app.use("/api/users", require("./src/routes/userRoutes"));
 app.use("/api/posts", require("./src/routes/postRoutes"));
 app.use("/api/reports", require("./src/routes/reportRoutes"));
 app.use("/api/notifications", require("./src/routes/notificationRoutes"));
+app.use("/api/chats", require("./src/routes/chatRoutes"));
 
 app.use("/api/contact", contactRoutes);
 app.use("/api/support", supportRoutes);

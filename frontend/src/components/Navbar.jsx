@@ -142,6 +142,10 @@ function Navbar() {
               People
             </NavLink>
 
+            <NavLink to="/chat" className={navLinkClass}>
+              Chat
+            </NavLink>
+
             <NavLink to="/my-reports" className={navLinkClass}>
               My Reports
             </NavLink>

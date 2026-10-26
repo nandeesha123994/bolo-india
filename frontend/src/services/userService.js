@@ -43,6 +43,18 @@ export const getProfile = async () => {
   return response.data;
 };
 
+export const getPublicProfile = async (userId) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.get(`${API_URL}/${userId}/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
 export const uploadProfilePhoto = async (formData) => {
   const token = localStorage.getItem("token");
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   createPost,
   getPosts,
@@ -27,14 +28,14 @@ const getInitials = (name = "") => {
     .slice(0, 2);
 };
 
-const ProfileAvatar = ({ name, image, className }) => {
+const ProfileAvatar = ({ name, image, className, userId }) => {
   const imageUrl = image
     ? image.startsWith("http")
       ? image
       : `${API_ORIGIN}${image}`
     : "";
 
-  return (
+  const avatar = (
     <div className={`${className} profile-avatar`}>
       {imageUrl && (
         <img
@@ -48,6 +49,18 @@ const ProfileAvatar = ({ name, image, className }) => {
       )}
       <span hidden={Boolean(imageUrl)}>{getInitials(name)}</span>
     </div>
+  );
+
+  return userId ? (
+    <Link
+      to={`/profile/${userId}`}
+      className="profile-avatar-link"
+      aria-label={`View ${name}'s profile`}
+    >
+      {avatar}
+    </Link>
+  ) : (
+    avatar
   );
 };
 
@@ -605,6 +618,7 @@ function Home() {
               posts.map((post) => {
                 const author = post.author || {};
                 const authorName = author.name || "Unknown User";
+                const authorId = author.id ?? post.authorId;
 
                 const authorPhoto =
                   author.profilePhoto || author.profileImage || "";
@@ -620,19 +634,56 @@ function Home() {
                     <div className="post-header">
                       <div className="post-author-block">
                         {authorAvatarUrl ? (
-                          <img
-                            src={authorAvatarUrl}
-                            alt={authorName}
-                            className="post-avatar"
-                          />
+                          authorId ? (
+                            <Link
+                              to={`/profile/${authorId}`}
+                              className="post-avatar-link"
+                              aria-label={`View ${authorName}'s profile`}
+                            >
+                              <img
+                                src={authorAvatarUrl}
+                                alt={authorName}
+                                className="post-avatar"
+                              />
+                            </Link>
+                          ) : (
+                            <img
+                              src={authorAvatarUrl}
+                              alt={authorName}
+                              className="post-avatar"
+                            />
+                          )
                         ) : (
-                          <div className="post-avatar-placeholder">
-                            {getInitials(authorName)}
-                          </div>
+                          authorId ? (
+                            <Link
+                              to={`/profile/${authorId}`}
+                              className="post-avatar-link"
+                              aria-label={`View ${authorName}'s profile`}
+                            >
+                              <div className="post-avatar-placeholder">
+                                {getInitials(authorName)}
+                              </div>
+                            </Link>
+                          ) : (
+                            <div className="post-avatar-placeholder">
+                              {getInitials(authorName)}
+                            </div>
+                          )
                         )}
 
                         <div className="post-author-meta">
-                          <span className="post-author-name">{authorName}</span>
+                          {authorId ? (
+                            <Link
+                              to={`/profile/${authorId}`}
+                              className="post-author-name"
+                            >
+                              {authorName}
+                            </Link>
+                          ) : (
+                            <span className="post-author-name">
+                              {authorName}
+                            </span>
+                          )}
 
                           <span className="post-time">
                             {formatRelativeTime(post.createdAt)}
@@ -753,12 +804,22 @@ function Home() {
                                 name={commenterName}
                                 image={commenter.profileImage}
                                 className="comment-avatar"
+                                userId={commenter.id}
                               />
                               <div className="comment-body">
                                 <div className="comment-meta">
-                                  <span className="comment-author">
-                                    {commenterName}
-                                  </span>
+                                  {commenter.id ? (
+                                    <Link
+                                      to={`/profile/${commenter.id}`}
+                                      className="comment-author"
+                                    >
+                                      {commenterName}
+                                    </Link>
+                                  ) : (
+                                    <span className="comment-author">
+                                      {commenterName}
+                                    </span>
+                                  )}
                                   <span className="comment-time">
                                     {formatRelativeTime(comment.createdAt)}
                                   </span>
@@ -780,6 +841,7 @@ function Home() {
                               loggedInUser?.profilePhoto
                             }
                             className="comment-avatar"
+                            userId={loggedInUser?.id}
                           />
                           <div className="comment-form">
                             <input

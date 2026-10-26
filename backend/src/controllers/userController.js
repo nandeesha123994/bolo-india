@@ -213,6 +213,86 @@ const getProfile = async (req, res) => {
   }
 };
 
+const getPublicProfile = async (req, res) => {
+  try {
+    const userId = Number(req.params.id);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({
+        message: "Invalid user ID",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        bio: true,
+        profileImage: true,
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+          },
+        },
+        followers: {
+          where: { followerId: req.user.id },
+          select: { id: true },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const isFollowing = user.followers.length > 0;
+    const canViewFollowersPosts = req.user.id === userId || isFollowing;
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: userId,
+        ...(canViewFollowersPosts
+          ? {}
+          : { visibility: "PUBLIC" }),
+      },
+      select: {
+        id: true,
+        content: true,
+        image: true,
+        video: true,
+        category: true,
+        hashtags: true,
+        location: true,
+        visibility: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return res.status(200).json({
+      user: {
+        id: user.id,
+        name: user.name,
+        bio: user.bio,
+        profileImage: user.profileImage,
+        followersCount: user._count.followers,
+        followingCount: user._count.following,
+        isFollowing,
+      },
+      posts,
+    });
+  } catch (error) {
+    console.error("Get public profile error:", error);
+
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 // ==================== UPDATE PROFILE PHOTO ====================
 
 const updateProfilePhoto = async (req, res) => {
@@ -1018,6 +1098,7 @@ module.exports = {
   registerUser,
   loginUser,
   getProfile,
+  getPublicProfile,
   createUserBySuperAdmin,
   updateProfilePhoto,
   followUser,

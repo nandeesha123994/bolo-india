@@ -11,6 +11,7 @@ frontend/dist/
 
 # Uploaded files
 backend/uploads/
+backend/private-chat-uploads/
 
 # Local tool configuration
 .kilo/
