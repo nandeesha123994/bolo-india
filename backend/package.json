@@ -23,7 +23,8 @@
     "multer": "^2.4.0",
     "nodemailer": "^10.0.10",
     "pg": "^8.23.0",
-    "prisma": "^7.10.0"
+    "prisma": "^7.10.0",
+    "resend": "^6.34.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
