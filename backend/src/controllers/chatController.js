@@ -2,13 +2,19 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 const prisma = require("../config/prisma");
 const {
+  broadcastConversationEvent,
+  broadcastChatMessage,
   createChatMessage,
+  deleteChatMessageForEveryone,
+  deleteChatMessageForUser,
+  editChatMessage,
   getConversationForParticipant,
   markMessagesRead,
   messageSelection,
   serializeChatMessage,
 } = require("../services/chatService");
 
+const MAX_MESSAGE_LENGTH = 5000;
 const privateChatImageDirectory = path.resolve(
   __dirname,
   "../../private-chat-uploads",
@@ -20,6 +26,7 @@ const userSelection = {
   id: true,
   name: true,
   profileImage: true,
+  lastSeenAt: true,
 };
 
 const requireConversationParticipant = async (req, res, next) => {
@@ -125,6 +132,7 @@ const getConversations = async (req, res) => {
         messages: {
           take: 1,
           orderBy: { createdAt: "desc" },
+          where: { hiddenFor: { none: { userId } } },
           select: messageSelection,
         },
       },
@@ -137,6 +145,8 @@ const getConversations = async (req, res) => {
             conversationId: conversation.id,
             senderId: { not: userId },
             readAt: null,
+            deletedAt: null,
+            hiddenFor: { none: { userId } },
           },
         });
 
@@ -173,7 +183,10 @@ const getConversationMessages = async (req, res) => {
       Math.max(Number.parseInt(req.query.limit, 10) || 30, 1),
       100,
     );
-    const where = { conversationId: req.conversation.id };
+    const where = {
+      conversationId: req.conversation.id,
+      hiddenFor: { none: { userId: req.user.id } },
+    };
     const [totalMessages, descendingMessages] = await Promise.all([
       prisma.chatMessage.count({ where }),
       prisma.chatMessage.findMany({
@@ -209,13 +222,19 @@ const markConversationRead = async (req, res) => {
   try {
     const result = await markMessagesRead(req.conversation.id, req.user.id);
     const io = req.app.get("io");
+    const senderId =
+      req.conversation.firstUserId === req.user.id
+        ? req.conversation.secondUserId
+        : req.conversation.firstUserId;
 
     if (result.messageIds.length > 0 && io) {
-      io.to(`conversation:${req.conversation.id}`).emit("message:read", {
+      io.to(`user:${senderId}`).emit("message:read", {
         conversationId: req.conversation.id,
         readerId: req.user.id,
         messageIds: result.messageIds,
         readAt: result.readAt,
+        deliveredAt: result.deliveredAt,
+        messages: result.messages,
       });
     }
 
@@ -228,6 +247,107 @@ const markConversationRead = async (req, res) => {
     return res.status(500).json({
       message: "Unable to mark conversation as read",
     });
+  }
+};
+
+const editMessage = async (req, res) => {
+  const messageId = Number(req.params.messageId);
+  const content =
+    typeof req.body?.content === "string" ? req.body.content.trim() : "";
+
+  if (!Number.isInteger(messageId) || messageId <= 0) {
+    return res.status(400).json({ message: "Invalid message ID" });
+  }
+  if (!content || content.length > MAX_MESSAGE_LENGTH) {
+    return res.status(400).json({
+      message: `Message must contain 1 to ${MAX_MESSAGE_LENGTH} characters`,
+    });
+  }
+
+  try {
+    const message = await editChatMessage({
+      conversationId: req.conversation.id,
+      messageId,
+      senderId: req.user.id,
+      content,
+    });
+    if (!message) {
+      return res.status(404).json({
+        message: "Message not found or cannot be edited",
+      });
+    }
+
+    broadcastConversationEvent(req.app.get("io"), req.conversation, "message:updated", {
+      conversationId: req.conversation.id,
+      message,
+    });
+    return res.status(200).json({ message });
+  } catch (error) {
+    console.error("Edit chat message error:", error);
+    return res.status(500).json({ message: "Unable to edit message" });
+  }
+};
+
+const deleteMessageForMe = async (req, res) => {
+  const messageId = Number(req.params.messageId);
+  if (!Number.isInteger(messageId) || messageId <= 0) {
+    return res.status(400).json({ message: "Invalid message ID" });
+  }
+
+  try {
+    const deleted = await deleteChatMessageForUser({
+      conversationId: req.conversation.id,
+      messageId,
+      userId: req.user.id,
+    });
+    if (!deleted) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    const payload = {
+      conversationId: req.conversation.id,
+      messageId,
+      userId: req.user.id,
+    };
+    req.app.get("io")?.to(`user:${req.user.id}`).emit(
+      "message:deleted-for-me",
+      payload,
+    );
+    return res.status(200).json({ message: "Message deleted for you" });
+  } catch (error) {
+    console.error("Delete chat message for user error:", error);
+    return res.status(500).json({ message: "Unable to delete message" });
+  }
+};
+
+const deleteMessageForEveryone = async (req, res) => {
+  const messageId = Number(req.params.messageId);
+  if (!Number.isInteger(messageId) || messageId <= 0) {
+    return res.status(400).json({ message: "Invalid message ID" });
+  }
+
+  try {
+    const message = await deleteChatMessageForEveryone({
+      conversationId: req.conversation.id,
+      messageId,
+      senderId: req.user.id,
+    });
+    if (!message) {
+      return res.status(404).json({
+        message: "Message not found or cannot be deleted",
+      });
+    }
+
+    broadcastConversationEvent(
+      req.app.get("io"),
+      req.conversation,
+      "message:deleted",
+      { conversationId: req.conversation.id, message },
+    );
+    return res.status(200).json({ message });
+  } catch (error) {
+    console.error("Delete chat message for everyone error:", error);
+    return res.status(500).json({ message: "Unable to delete message" });
   }
 };
 
@@ -246,9 +366,7 @@ const uploadChatImage = async (req, res) => {
     });
     const io = req.app.get("io");
 
-    if (io) {
-      io.to(`conversation:${req.conversation.id}`).emit("message:new", message);
-    }
+    broadcastChatMessage(io, req.conversation, message);
 
     return res.status(201).json({ message });
   } catch (error) {
@@ -282,6 +400,8 @@ const getChatImage = async (req, res) => {
         id: messageId,
         conversationId: req.conversation.id,
         image: { not: null },
+        deletedAt: null,
+        hiddenFor: { none: { userId: req.user.id } },
       },
       select: { image: true },
     });
@@ -339,6 +459,9 @@ module.exports = {
   createOrGetConversation,
   getConversations,
   getConversationMessages,
+  editMessage,
+  deleteMessageForMe,
+  deleteMessageForEveryone,
   markConversationRead,
   requireConversationParticipant,
   getChatImage,

@@ -65,6 +65,39 @@ export const uploadChatImage = async (conversationId, imageFile) => {
   return response.data.message;
 };
 
+export const editChatMessage = async (conversationId, messageId, content) => {
+  const response = await axios.patch(
+    `${API_URL}/conversations/${conversationId}/messages/${messageId}`,
+    { content },
+    { headers: getAuthHeaders() },
+  );
+
+  return response.data.message;
+};
+
+export const deleteChatMessageForMe = async (conversationId, messageId) => {
+  const response = await axios.post(
+    `${API_URL}/conversations/${conversationId}/messages/${messageId}/delete-for-me`,
+    {},
+    { headers: getAuthHeaders() },
+  );
+
+  return response.data;
+};
+
+export const deleteChatMessageForEveryone = async (
+  conversationId,
+  messageId,
+) => {
+  const response = await axios.post(
+    `${API_URL}/conversations/${conversationId}/messages/${messageId}/delete-for-everyone`,
+    {},
+    { headers: getAuthHeaders() },
+  );
+
+  return response.data.message;
+};
+
 export const getChatImage = async (imagePath, signal) => {
   const response = await axios.get(`${API_ORIGIN}${imagePath}`, {
     headers: getAuthHeaders(),

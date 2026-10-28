@@ -38,6 +38,7 @@ model User {
   isActive         Boolean  @default(true)
   bio              String?
   profileImage     String?
+  lastSeenAt       DateTime?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -57,6 +58,7 @@ model User {
   chatConversationsAsFirst  ChatConversation[] @relation("ChatConversationFirstUser")
   chatConversationsAsSecond ChatConversation[] @relation("ChatConversationSecondUser")
   chatMessages              ChatMessage[]     @relation("ChatMessageSender")
+  chatMessageDeletions      ChatMessageDeletion[]
 }
 
 model WelcomeEmailOutbox {
@@ -98,14 +100,30 @@ model ChatMessage {
   senderId       Int
   content        String?
   image          String?
+  deliveredAt    DateTime?
   readAt         DateTime?
+  editedAt       DateTime?
+  deletedAt      DateTime?
   createdAt      DateTime @default(now())
 
   conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User             @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  hiddenFor    ChatMessageDeletion[]
 
   @@index([conversationId, createdAt])
   @@index([conversationId, readAt])
+}
+
+model ChatMessageDeletion {
+  messageId Int
+  userId    Int
+  deletedAt DateTime @default(now())
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([messageId, userId])
+  @@index([userId, deletedAt])
 }
 
 model Post {

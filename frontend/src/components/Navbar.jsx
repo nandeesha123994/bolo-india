@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import "../styles/Navbar.css";
 
 import {
@@ -10,6 +10,7 @@ import {
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -119,12 +120,15 @@ function Navbar() {
   const navLinkClass = ({ isActive }) => `nav-link${isActive ? " active" : ""}`;
 
   return (
-    <nav className="navbar">
+    <nav
+      className={`navbar${location.pathname === "/chat" ? " chat-navbar" : ""}`}
+    >
       <div
         className="navbar-logo"
         onClick={() => navigate(token ? "/home" : "/")}
       >
-        🇮🇳 Bolo India
+        <span className="navbar-logo-in">IN</span>
+        <span className="navbar-logo-name">Bolo India</span>
       </div>
 
       <div className="navbar-links">
@@ -166,7 +170,10 @@ function Navbar() {
               onClick={() => setShowNotifications((previous) => !previous)}
               aria-label="Notifications"
             >
-              🔔
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                <path d="M10 21h4" />
+              </svg>
               {unreadCount > 0 && (
                 <span className="notification-count">{unreadCount}</span>
               )}

@@ -8,6 +8,9 @@ const {
 } = require("../middleware/chatImageUploadMiddleware");
 const {
   createOrGetConversation,
+  deleteMessageForEveryone,
+  deleteMessageForMe,
+  editMessage,
   getChatImage,
   getConversations,
   getConversationMessages,
@@ -37,6 +40,21 @@ router.patch(
   "/conversations/:conversationId/read",
   requireConversationParticipant,
   markConversationRead,
+);
+router.patch(
+  "/conversations/:conversationId/messages/:messageId",
+  requireConversationParticipant,
+  editMessage,
+);
+router.post(
+  "/conversations/:conversationId/messages/:messageId/delete-for-me",
+  requireConversationParticipant,
+  deleteMessageForMe,
+);
+router.post(
+  "/conversations/:conversationId/messages/:messageId/delete-for-everyone",
+  requireConversationParticipant,
+  deleteMessageForEveryone,
 );
 router.post(
   "/conversations/:conversationId/images",

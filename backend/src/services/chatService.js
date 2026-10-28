@@ -6,7 +6,10 @@ const messageSelection = {
   senderId: true,
   content: true,
   image: true,
+  deliveredAt: true,
   readAt: true,
+  editedAt: true,
+  deletedAt: true,
   createdAt: true,
   sender: {
     select: {
@@ -63,36 +66,174 @@ const createChatMessage = async ({ conversationId, senderId, content, image }) =
   });
 
 const markMessagesRead = async (conversationId, readerId) => {
-  const unreadMessages = await prisma.chatMessage.findMany({
+  return prisma.$transaction(async (transaction) => {
+    const readAt = new Date();
+    const readMessages = await transaction.chatMessage.updateManyAndReturn({
+      where: {
+        conversationId,
+        senderId: { not: readerId },
+        readAt: null,
+        deletedAt: null,
+        hiddenFor: { none: { userId: readerId } },
+      },
+      data: { readAt },
+      select: { id: true },
+    });
+
+    if (readMessages.length === 0) {
+      return {
+        messageIds: [],
+        readAt: null,
+        deliveredAt: null,
+        messages: [],
+      };
+    }
+
+    const messageIds = readMessages.map((message) => message.id);
+    await transaction.chatMessage.updateMany({
+      where: {
+        id: { in: messageIds },
+        deliveredAt: null,
+      },
+      data: { deliveredAt: readAt },
+    });
+
+    const messages = await transaction.chatMessage.findMany({
+      where: { id: { in: messageIds } },
+      select: {
+        id: true,
+        senderId: true,
+        deliveredAt: true,
+        readAt: true,
+      },
+    });
+
+    return { messageIds, readAt, deliveredAt: readAt, messages };
+  });
+};
+
+const markMessagesDelivered = async (conversationId, recipientId, messageIds) => {
+  if (!messageIds.length) return [];
+
+  return prisma.chatMessage.updateManyAndReturn({
     where: {
       conversationId,
-      senderId: { not: readerId },
-      readAt: null,
-    },
-    select: { id: true },
-  });
-
-  if (unreadMessages.length === 0) {
-    return { messageIds: [], readAt: null };
-  }
-
-  const readAt = new Date();
-  const messageIds = unreadMessages.map((message) => message.id);
-
-  await prisma.chatMessage.updateMany({
-    where: {
       id: { in: messageIds },
-      readAt: null,
+      senderId: { not: recipientId },
+      deliveredAt: null,
+      deletedAt: null,
+      hiddenFor: { none: { userId: recipientId } },
     },
-    data: { readAt },
+    data: { deliveredAt: new Date() },
+    select: {
+      id: true,
+      senderId: true,
+      deliveredAt: true,
+      readAt: true,
+    },
+  });
+};
+
+const editChatMessage = async ({ conversationId, messageId, senderId, content }) => {
+  const updatedMessages = await prisma.chatMessage.updateManyAndReturn({
+    where: {
+      id: messageId,
+      conversationId,
+      senderId,
+      content: { not: null },
+      image: null,
+      deletedAt: null,
+    },
+    data: { content, editedAt: new Date() },
+    select: messageSelection,
   });
 
-  return { messageIds, readAt };
+  return updatedMessages[0] ? serializeChatMessage(updatedMessages[0]) : null;
+};
+
+const deleteChatMessageForUser = async ({ conversationId, messageId, userId }) =>
+  prisma.$transaction(async (transaction) => {
+    const message = await transaction.chatMessage.findFirst({
+      where: { id: messageId, conversationId },
+      select: { id: true },
+    });
+    if (!message) return false;
+
+    await transaction.chatMessageDeletion.upsert({
+      where: { messageId_userId: { messageId, userId } },
+      create: { messageId, userId },
+      update: {},
+    });
+    return true;
+  });
+
+const deleteChatMessageForEveryone = async ({
+  conversationId,
+  messageId,
+  senderId,
+}) =>
+  prisma.$transaction(async (transaction) => {
+    const existingMessage = await transaction.chatMessage.findFirst({
+      where: { id: messageId, conversationId, senderId },
+      select: messageSelection,
+    });
+    if (!existingMessage) return null;
+    if (existingMessage.deletedAt) {
+      return serializeChatMessage(existingMessage);
+    }
+
+    const deletedMessages = await transaction.chatMessage.updateManyAndReturn({
+      where: {
+        id: messageId,
+        conversationId,
+        senderId,
+        deletedAt: null,
+      },
+      data: {
+        content: null,
+        image: null,
+        deletedAt: new Date(),
+      },
+      select: messageSelection,
+    });
+    if (deletedMessages[0]) {
+      return serializeChatMessage(deletedMessages[0]);
+    }
+
+    const concurrentlyDeletedMessage = await transaction.chatMessage.findFirst({
+      where: { id: messageId, conversationId, senderId, deletedAt: { not: null } },
+      select: messageSelection,
+    });
+    return concurrentlyDeletedMessage
+      ? serializeChatMessage(concurrentlyDeletedMessage)
+      : null;
+  });
+
+const broadcastChatMessage = (io, conversation, message) => {
+  if (!io) return;
+
+  for (const userId of [conversation.firstUserId, conversation.secondUserId]) {
+    io.to(`user:${userId}`).emit("message:new", message);
+  }
+};
+
+const broadcastConversationEvent = (io, conversation, event, payload) => {
+  if (!io) return;
+
+  for (const userId of [conversation.firstUserId, conversation.secondUserId]) {
+    io.to(`user:${userId}`).emit(event, payload);
+  }
 };
 
 module.exports = {
+  broadcastChatMessage,
+  broadcastConversationEvent,
   createChatMessage,
+  deleteChatMessageForEveryone,
+  deleteChatMessageForUser,
+  editChatMessage,
   getConversationForParticipant,
+  markMessagesDelivered,
   markMessagesRead,
   messageSelection,
   serializeChatMessage,
