@@ -106,8 +106,13 @@
 }
 
 /* Login button */
-.login-card form > button {
+.login-card form > button.login-submit {
+  display: inline-flex;
   width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   padding: 13px;
   border: none;
   border-radius: 8px;
@@ -116,10 +121,40 @@
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  transition:
+    background 0.18s ease,
+    opacity 0.18s ease;
 }
 
-.login-card form > button:hover {
+.login-card form > button.login-submit:hover:not(:disabled) {
   background: #1d4ed8;
+}
+
+.login-card form > button.login-submit:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.login-spinner {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: login-spinner-rotation 0.7s linear infinite;
+}
+
+@keyframes login-spinner-rotation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-spinner {
+    animation-duration: 1.4s;
+  }
 }
 
 /* Error message */

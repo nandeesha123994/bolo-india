@@ -1,6 +1,6 @@
 import "../styles/Login.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { loginUser } from "../services/authService";
 
 function Login() {
@@ -11,6 +11,8 @@ function Login() {
   const [success, setSuccess] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const loginInProgressRef = useRef(false);
 
   const navigate = useNavigate();
 
@@ -40,6 +42,7 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (loginInProgressRef.current) return;
 
     setErrors({});
     setSuccess("");
@@ -47,6 +50,9 @@ function Login() {
     if (!validateForm()) {
       return;
     }
+
+    loginInProgressRef.current = true;
+    setIsLoading(true);
 
     try {
       const data = await loginUser(email, password);
@@ -61,8 +67,12 @@ function Login() {
       }, 1500);
     } catch (error) {
       setErrors({
-        server: error.response?.data?.message || "Login failed",
+        server:
+          error?.response?.data?.message || error?.message || "Login failed",
       });
+    } finally {
+      loginInProgressRef.current = false;
+      setIsLoading(false);
     }
   };
 
@@ -81,15 +91,25 @@ function Login() {
         <h2>Welcome Back</h2>
         <p>Login to your account</p>
 
-        {errors.server && <p className="login-error">{errors.server}</p>}
+        {errors.server && (
+          <p className="login-error" role="alert">
+            {errors.server}
+          </p>
+        )}
 
-        {success && <p className="login-success">{success}</p>}
+        {success && (
+          <p className="login-success" role="status">
+            {success}
+          </p>
+        )}
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} aria-busy={isLoading}>
           {/* Email */}
           <input
             type="email"
             placeholder="Enter your email"
+            aria-label="Email"
+            aria-invalid={Boolean(errors.email)}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -101,6 +121,8 @@ function Login() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
+              aria-label="Password"
+              aria-invalid={Boolean(errors.password)}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -120,7 +142,16 @@ function Login() {
             <Link to="/forgot-password">Forgot Password?</Link>
           </div>
 
-          <button type="submit">Login</button>
+          <button
+            type="submit"
+            className="login-submit"
+            disabled={isLoading}
+          >
+            {isLoading && (
+              <span className="login-spinner" aria-hidden="true" />
+            )}
+            <span>{isLoading ? "Logging in..." : "Login"}</span>
+          </button>
         </form>
 
         <div className="login-register">
