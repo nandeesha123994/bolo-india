@@ -1,14 +1,35 @@
 const prisma = require("../config/prisma");
-const fs = require("fs");
+const cloudinary = require("../config/cloudinary");
 
 const { createNotification } = require("../services/notificationService");
+
+const uploadPostMedia = (file, resourceType) =>
+  new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "bolo-india/posts",
+        resource_type: resourceType,
+      },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+
+        if (!result?.secure_url || !result.public_id) {
+          return reject(new Error("Cloudinary returned incomplete upload data"));
+        }
+
+        return resolve(result);
+      },
+    );
+
+    stream.end(file.buffer);
+  });
 
 // ==================== CREATE POST ====================
 
 const createPost = async (req, res) => {
-  const uploadedFiles = Object.values(req.files || {})
-    .flat()
-    .map((file) => file.path);
+  let cloudinaryAsset = null;
 
   try {
     const {
@@ -29,32 +50,32 @@ const createPost = async (req, res) => {
     const imageFile = req.files?.image?.[0];
     const videoFile = req.files?.video?.[0];
 
-    const image = imageFile ? `/uploads/${imageFile.filename}` : null;
-    const video = videoFile ? `/uploads/${videoFile.filename}` : null;
-
     const allowComments =
       commentsEnabled === undefined
         ? true
         : commentsEnabled === "true" || commentsEnabled === true;
 
     // A post can have either an image or a video, not both
-    if (image && video) {
-      uploadedFiles.forEach((filePath) => {
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      });
-
+    if (imageFile && videoFile) {
       return res.status(400).json({
         message: "A post can contain either an image or a video, not both",
       });
     }
 
+    const mediaFile = imageFile || videoFile;
+    const resourceType = imageFile ? "image" : videoFile ? "video" : null;
+
+    if (mediaFile) {
+      cloudinaryAsset = await uploadPostMedia(mediaFile, resourceType);
+    }
+
     const post = await prisma.post.create({
       data: {
         content: content.trim(),
-        image,
-        video: video || null,
+        image: imageFile ? cloudinaryAsset.secure_url : null,
+        video: videoFile ? cloudinaryAsset.secure_url : null,
+        mediaPublicId: cloudinaryAsset?.public_id || null,
+        mediaResourceType: cloudinaryAsset?.resource_type || null,
         category: category || null,
         hashtags: hashtags || null,
         location: location || null,
@@ -71,11 +92,15 @@ const createPost = async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    uploadedFiles.forEach((filePath) => {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    if (cloudinaryAsset) {
+      try {
+        await cloudinary.uploader.destroy(cloudinaryAsset.public_id, {
+          resource_type: cloudinaryAsset.resource_type,
+        });
+      } catch (cleanupError) {
+        console.error("Failed to clean up Cloudinary post upload:", cleanupError);
       }
-    });
+    }
 
     res.status(500).json({
       message: "Server error",

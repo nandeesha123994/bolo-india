@@ -398,7 +398,11 @@ function AdminDashboard() {
 
                     {post.image && (
                       <img
-                        src={`${API_ORIGIN}${post.image}`}
+                        src={
+                          post.image.startsWith("http")
+                            ? post.image
+                            : `${API_ORIGIN}${post.image}`
+                        }
                         alt="Post"
                         className="admin-post-image"
                       />

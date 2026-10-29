@@ -16,6 +16,12 @@ import "../styles/Home.css";
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
 const SUPPORTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 
+const getMediaUrl = (path) => {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${API_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
+};
+
 const getInitials = (name = "") => {
   const words = name.trim().split(/\s+/).filter(Boolean);
 
@@ -714,7 +720,7 @@ function Home() {
                     {/* Post Image */}
                     {post.image && (
                       <img
-                        src={`${API_ORIGIN}${post.image}`}
+                        src={getMediaUrl(post.image)}
                         alt="Post"
                         className="post-image"
                       />
@@ -723,11 +729,7 @@ function Home() {
                     {/* Post Video */}
                     {post.video && (
                       <video
-                        src={
-                          post.video.startsWith("http")
-                            ? post.video
-                            : `${API_ORIGIN}${post.video}`
-                        }
+                        src={getMediaUrl(post.video)}
                         controls
                         className="post-video"
                       />

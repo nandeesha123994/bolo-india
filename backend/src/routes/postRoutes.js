@@ -19,13 +19,25 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+const receivePostUploads = (req, res, next) => {
+  upload.memory.fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ])(req, res, (error) => {
+    if (error) {
+      return res.status(error.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({
+        message: error.message || "Invalid file upload",
+      });
+    }
+
+    return next();
+  });
+};
+
 router.post(
   "/",
   authMiddleware,
-  upload.fields([
-    { name: "image", maxCount: 1 },
-    { name: "video", maxCount: 1 },
-  ]),
+  receivePostUploads,
   createPost,
 );
 router.get("/", getAllPosts);

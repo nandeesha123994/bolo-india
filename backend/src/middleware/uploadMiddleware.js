@@ -37,12 +37,16 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50 MB for images and videos
-  },
-});
+const createUpload = (uploadStorage) =>
+  multer({
+    storage: uploadStorage,
+    fileFilter,
+    limits: {
+      fileSize: 50 * 1024 * 1024, // 50 MB for images and videos
+    },
+  });
+
+const upload = createUpload(storage);
+upload.memory = createUpload(multer.memoryStorage());
 
 module.exports = upload;

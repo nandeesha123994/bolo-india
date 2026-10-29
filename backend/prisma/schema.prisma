@@ -26,38 +26,38 @@ enum PostVisibility {
 }
 
 model User {
-  id               Int      @id @default(autoincrement())
-  name             String
-  email            String   @unique
-  password         String
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
 
   resetToken       String?
   resetTokenExpiry DateTime?
 
-  role             Role     @default(USER)
-  isActive         Boolean  @default(true)
-  bio              String?
-  profileImage     String?
-  lastSeenAt       DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  role         Role      @default(USER)
+  isActive     Boolean   @default(true)
+  bio          String?
+  profileImage String?
+  lastSeenAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  posts            Post[]
-  comments         Comment[]
-  likes            Like[]
+  posts    Post[]
+  comments Comment[]
+  likes    Like[]
 
-  followers        Follow[] @relation("followers")
-  following        Follow[] @relation("following")
+  followers Follow[] @relation("followers")
+  following Follow[] @relation("following")
 
-  reports          Report[]
-  supportMessages  SupportMessage[]
+  reports         Report[]
+  supportMessages SupportMessage[]
 
-  notifications    Notification[]
+  notifications      Notification[]
   welcomeEmailOutbox WelcomeEmailOutbox?
 
-  chatConversationsAsFirst  ChatConversation[] @relation("ChatConversationFirstUser")
-  chatConversationsAsSecond ChatConversation[] @relation("ChatConversationSecondUser")
-  chatMessages              ChatMessage[]     @relation("ChatMessageSender")
+  chatConversationsAsFirst  ChatConversation[]    @relation("ChatConversationFirstUser")
+  chatConversationsAsSecond ChatConversation[]    @relation("ChatConversationSecondUser")
+  chatMessages              ChatMessage[]         @relation("ChatMessageSender")
   chatMessageDeletions      ChatMessageDeletion[]
 }
 
@@ -78,15 +78,15 @@ model WelcomeEmailOutbox {
 }
 
 model ChatConversation {
-  id             Int      @id @default(autoincrement())
-  firstUserId    Int
-  secondUserId   Int
-  lastMessageAt  DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  firstUserId   Int
+  secondUserId  Int
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  firstUser  User         @relation("ChatConversationFirstUser", fields: [firstUserId], references: [id], onDelete: Cascade)
-  secondUser User         @relation("ChatConversationSecondUser", fields: [secondUserId], references: [id], onDelete: Cascade)
+  firstUser  User          @relation("ChatConversationFirstUser", fields: [firstUserId], references: [id], onDelete: Cascade)
+  secondUser User          @relation("ChatConversationSecondUser", fields: [secondUserId], references: [id], onDelete: Cascade)
   messages   ChatMessage[]
 
   @@unique([firstUserId, secondUserId])
@@ -95,7 +95,7 @@ model ChatConversation {
 }
 
 model ChatMessage {
-  id             Int      @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   conversationId Int
   senderId       Int
   content        String?
@@ -104,10 +104,10 @@ model ChatMessage {
   readAt         DateTime?
   editedAt       DateTime?
   deletedAt      DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
 
-  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User             @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  conversation ChatConversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User                  @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   hiddenFor    ChatMessageDeletion[]
 
   @@index([conversationId, createdAt])
@@ -127,28 +127,30 @@ model ChatMessageDeletion {
 }
 
 model Post {
-  id              Int      @id @default(autoincrement())
-  content         String
-  image           String?
-  video           String?
-  category        String?
-  hashtags        String?
-  location        String?
+  id                Int     @id @default(autoincrement())
+  content           String
+  image             String?
+  video             String?
+  mediaPublicId     String?
+  mediaResourceType String?
+  category          String?
+  hashtags          String?
+  location          String?
 
   visibility      PostVisibility @default(PUBLIC)
   commentsEnabled Boolean        @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  authorId        Int
-  author          User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  comments        Comment[]
-  likes           Like[]
-  reports         Report[]
+  comments Comment[]
+  likes    Like[]
+  reports  Report[]
 
-  notifications   Notification[]
+  notifications Notification[]
 }
 
 model Comment {
@@ -156,35 +158,35 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
 
-  userId    Int
-  postId    Int
+  userId Int
+  postId Int
 
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Like {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  userId    Int
-  postId    Int
+  userId Int
+  postId Int
 
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
 }
 
 model Follow {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
 
   followerId  Int
   followingId Int
 
-  follower    User @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
-  following   User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+  follower  User @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
 }
@@ -214,8 +216,8 @@ model SupportMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId    Int
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
@@ -227,20 +229,20 @@ model Notification {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   post Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model ContactMessage {
-  id         Int      @id @default(autoincrement())
+  id         Int           @id @default(autoincrement())
   name       String
   email      String
   subject    String
   message    String
   adminReply String?
   status     ContactStatus @default(PENDING)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 }
 
 enum ContactStatus {
